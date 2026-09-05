@@ -27,17 +27,11 @@
 				"center": true,
 				"decorations": true,
 				"titleBarStyle": "Overlay",
-				"hiddenTitle": true,
-				"trafficLightPosition": {
-					"x": 16,
-					"y": 16
-				},
 				"visible": false,
-				"backgroundThrottling": "normal",
+				"backgroundThrottling": "suspend",
 				"url": "/"
 			}
 		],
-		"macOSPrivateApi": true,
 		"security": {
 			"csp": null,
 			"assetProtocol": {

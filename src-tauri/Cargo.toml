@@ -105,7 +105,6 @@ log = { workspace = true }
 # tauri 相关
 tauri = { workspace = true, features = [
     "protocol-asset",
-    "macos-private-api",
     "tray-icon",
     "image-ico",
     "image-png",
