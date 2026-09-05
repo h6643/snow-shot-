@@ -14,6 +14,14 @@ on:
                 description: "Version (e.g. v1.0.0)"
                 required: true
                 type: string
+            build_windows:
+                description: "构建 Windows 版"
+                type: boolean
+                default: true
+            build_linux:
+                description: "构建 Linux 版"
+                type: boolean
+                default: true
 
 jobs:
     create-release:
@@ -63,27 +71,43 @@ jobs:
         outputs:
             app_version: ${{ steps.app_version.outputs.version }}
 
+    # 根据手动触发参数动态生成构建矩阵（可只构建单一平台）
+    prepare-matrix:
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.matrix.outputs.matrix }}
+        steps:
+            - id: matrix
+              run: |
+                  BUILD_WINDOWS=true
+                  BUILD_LINUX=true
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    BUILD_WINDOWS=${{ inputs.build_windows }}
+                    BUILD_LINUX=${{ inputs.build_linux }}
+                  fi
+
+                  MATRIX='['
+                  if [ "$BUILD_WINDOWS" = "true" ]; then
+                    MATRIX+='{"platform":"windows-latest","target":"x86_64-pc-windows-msvc"},'
+                    MATRIX+='{"platform":"windows-latest","target":"x86_64-pc-windows-msvc","offline":true},'
+                  fi
+                  if [ "$BUILD_LINUX" = "true" ]; then
+                    MATRIX+='{"platform":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu"},'
+                  fi
+                  MATRIX=$(echo "$MATRIX" | sed 's/,$//')
+                  MATRIX+=']'
+                  echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
+              shell: bash
+
     # 编译 Tauri 应用
     build-app:
-        needs: create-release
+        needs: [create-release, prepare-matrix]
         permissions:
             contents: write
         strategy:
             fail-fast: false
             matrix:
-                include:
-                    # Windows standard
-                    - platform: "windows-latest"
-                      target: "x86_64-pc-windows-msvc"
-
-                    # Windows offline version
-                    - platform: "windows-latest"
-                      target: "x86_64-pc-windows-msvc"
-                      offline: true
-
-                    # Linux x64
-                    - platform: "ubuntu-22.04"
-                      target: "x86_64-unknown-linux-gnu"
+                include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
 
         runs-on: ${{ matrix.platform }}
         steps:
