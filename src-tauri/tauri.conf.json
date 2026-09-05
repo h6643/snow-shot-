@@ -28,7 +28,7 @@
 				"decorations": true,
 				"titleBarStyle": "Overlay",
 				"visible": false,
-				"backgroundThrottling": "suspend",
+				"backgroundThrottling": "throttle",
 				"url": "/"
 			}
 		],
