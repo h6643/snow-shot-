@@ -4,9 +4,7 @@ import {
 	getCurrentWindow,
 } from "@tauri-apps/api/window";
 import { ConfigProvider, type ThemeConfig, theme } from "antd";
-import enUS from "antd/es/locale/en_US";
 import zhCN from "antd/es/locale/zh_CN";
-import zhTW from "antd/es/locale/zh_TW";
 import { debounce, isEqual, trim } from "es-toolkit";
 import React, {
 	useCallback,
@@ -28,7 +26,6 @@ import {
 	AppSettingsLoadingPublisher,
 	AppSettingsPublisher,
 } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { releaseDrawPage } from "@/functions/screenshot";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -169,7 +166,6 @@ const AppSettingsContextProviderCore: React.FC<{
 		[writeAppSettings],
 	);
 
-	const { isReady } = usePluginServiceContext();
 	const updateAppSettings = useCallback(
 		(
 			group: AppSettingsGroup,
@@ -229,12 +225,8 @@ const AppSettingsContextProviderCore: React.FC<{
 						switch (newSettings?.language) {
 							case "zh-Hans":
 								return AppSettingsLanguage.ZHHans;
-							case "zh-Hant":
-								return AppSettingsLanguage.ZHHant;
-							case "en":
-								return AppSettingsLanguage.EN;
 							default:
-								return prevSettings?.language ?? AppSettingsLanguage.EN;
+								return AppSettingsLanguage.ZHHans;
 						}
 					})(),
 					browserLanguage:
@@ -659,88 +651,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							: (prevSettings?.ocrModel ??
 								defaultAppSettingsData[group].ocrModel),
 				};
-			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					cacheSourceLanguage:
-						typeof newSettings?.cacheSourceLanguage === "string"
-							? newSettings.cacheSourceLanguage
-							: (prevSettings?.cacheSourceLanguage ??
-								defaultAppSettingsData[group].cacheSourceLanguage),
-					cacheTargetLanguage:
-						typeof newSettings?.cacheTargetLanguage === "string"
-							? newSettings.cacheTargetLanguage
-							: (prevSettings?.cacheTargetLanguage ??
-								defaultAppSettingsData[group].cacheTargetLanguage),
-					cacheTranslationDomain:
-						typeof newSettings?.cacheTranslationDomain === "string"
-							? newSettings.cacheTranslationDomain
-							: (prevSettings?.cacheTranslationDomain ??
-								defaultAppSettingsData[group].cacheTranslationDomain),
-					cacheTranslationType:
-						typeof newSettings?.cacheTranslationType === "number" ||
-						typeof newSettings?.cacheTranslationType === "string"
-							? newSettings.cacheTranslationType
-							: (prevSettings?.cacheTranslationType ??
-								defaultAppSettingsData[group].cacheTranslationType),
-				};
-			} else if (group === AppSettingsGroup.FunctionTranslation) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					translationSystemPrompt:
-						typeof newSettings?.translationSystemPrompt === "string"
-							? newSettings.translationSystemPrompt
-							: (prevSettings?.translationSystemPrompt ??
-								defaultAppSettingsData[group].translationSystemPrompt),
-					optimizeAiTranslationLayout:
-						typeof newSettings?.optimizeAiTranslationLayout === "boolean"
-							? newSettings.optimizeAiTranslationLayout
-							: (prevSettings?.optimizeAiTranslationLayout ??
-								defaultAppSettingsData[group].optimizeAiTranslationLayout),
-					translationApiConfigList: Array.isArray(
-						newSettings?.translationApiConfigList,
-					)
-						? newSettings.translationApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_type: item.api_type,
-								deepl_prefer_quality_optimized:
-									typeof item.deepl_prefer_quality_optimized === "boolean"
-										? item.deepl_prefer_quality_optimized
-										: false,
-							}))
-						: (prevSettings?.translationApiConfigList ??
-							defaultAppSettingsData[group].translationApiConfigList),
-					sourceLanguage:
-						typeof newSettings?.sourceLanguage === "string"
-							? newSettings.sourceLanguage
-							: (prevSettings?.sourceLanguage ??
-								defaultAppSettingsData[group].sourceLanguage),
-					targetLanguage:
-						typeof newSettings?.targetLanguage === "string"
-							? newSettings.targetLanguage
-							: (prevSettings?.targetLanguage ??
-								defaultAppSettingsData[group].targetLanguage),
-					translationDomain:
-						typeof newSettings?.translationDomain === "string"
-							? newSettings.translationDomain
-							: (prevSettings?.translationDomain ??
-								defaultAppSettingsData[group].translationDomain),
-					translationType:
-						typeof newSettings?.translationType === "number" ||
-						typeof newSettings?.translationType === "string"
-							? newSettings.translationType
-							: (prevSettings?.translationType ??
-								defaultAppSettingsData[group].translationType),
-				};
 			} else if (group === AppSettingsGroup.FunctionScreenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];
 				const prevSettings = appSettingsRef.current[group] as
@@ -1024,7 +934,7 @@ const AppSettingsContextProviderCore: React.FC<{
 				settings = {
 					hotLoadPageCount:
 						typeof newSettings?.hotLoadPageCount === "number"
-							? Math.max(Math.min(0, newSettings.hotLoadPageCount), 0)
+							? Math.max(Math.min(3, newSettings.hotLoadPageCount), 0)
 							: (prevSettings?.hotLoadPageCount ??
 								defaultAppSettingsData[group].hotLoadPageCount),
 				};
@@ -1151,17 +1061,9 @@ const AppSettingsContextProviderCore: React.FC<{
 		});
 	}, [reloadAppSettings]);
 
-	const [, antdLocale] = useMemo(() => {
-		const language = appSettings[AppSettingsGroup.Common].language;
-		switch (language) {
-			case AppSettingsLanguage.ZHHans:
-				return ["zh-CN", zhCN];
-			case AppSettingsLanguage.ZHHant:
-				return ["zh-TW", zhTW];
-			default:
-				return ["en-US", enUS];
-		}
-	}, [appSettings]);
+	const antdLocale = useMemo(() => {
+		return zhCN;
+	}, []);
 
 	const appSettingsContextValue = useMemo(() => {
 		return {

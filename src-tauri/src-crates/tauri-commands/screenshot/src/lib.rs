@@ -629,7 +629,6 @@ pub async fn create_draw_window(app: tauri::AppHandle) {
     .inner_size(1.0, 1.0)
     .visible(false)
     .focused(false)
-    .additional_browser_args("--js-flags=--max-old-space-size=256")
 
     .build()
     .unwrap();

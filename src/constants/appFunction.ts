@@ -18,10 +18,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
 		},
-		[AppFunction.ScreenshotOcrTranslate]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Screenshot,
-		},
 		[AppFunction.ScreenshotFullScreen]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
@@ -29,14 +25,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 		[AppFunction.ScreenshotFocusedWindow]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
-		},
-		[AppFunction.TranslationSelectText]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Translation,
-		},
-		[AppFunction.Translation]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Translation,
 		},
 		[AppFunction.FixedContent]: {
 			shortcutKey: "",

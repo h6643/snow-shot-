@@ -6,10 +6,6 @@ export enum AppFunction {
 	ScreenshotFocusedWindow = "screenshotFocusedWindow",
 	/** 截图全屏 */
 	ScreenshotFullScreen = "screenshotFullScreen",
-	/** 截图翻译 */
-	ScreenshotOcrTranslate = "screenshotOcrTranslate",
-	Translation = "translation",
-	TranslationSelectText = "translationSelectText",
 	FixedContent = "fixedContent",
 	TopWindow = "topWindow",
 	FullScreenDraw = "fullScreenDraw",
@@ -20,7 +16,6 @@ export enum AppFunction {
 
 export enum AppFunctionGroup {
 	Screenshot = "screenshot",
-	Translation = "translation",
 	Other = "other",
 }
 

@@ -15,16 +15,12 @@ import {
 	TrayIconClickAction,
 } from "@/types/appSettings";
 import { DrawState } from "@/types/draw";
-import {
-	TranslationDomain,
-	TranslationType,
-} from "@/types/servies/translation";
+
 import { ImageFormat } from "@/types/utils/file";
 import { getPlatformValue } from "@/utils/platform";
 import { defaultAppFunctionConfigs } from "./appFunction";
 import { defaultCommonKeyEventSettings } from "./commonKeyEvent";
 import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "./components/screenshot";
-import { defaultTranslationPrompt } from "./components/translation";
 import { defaultDrawToolbarKeyEventSettings } from "./drawToolbarKeyEvent";
 
 export const defaultAppSettingsData: AppSettingsData = {
@@ -99,21 +95,7 @@ export const defaultAppSettingsData: AppSettingsData = {
 		autoCheckVersion: true,
 		runLog: false,
 	},
-	[AppSettingsGroup.FunctionTranslation]: {
-		optimizeAiTranslationLayout: true,
-		translationSystemPrompt: defaultTranslationPrompt,
-		translationApiConfigList: [],
-		sourceLanguage: "auto",
-		targetLanguage: "zh-CHS",
-		translationDomain: TranslationDomain.General,
-		translationType: TranslationType.Youdao,
-	},
-	[AppSettingsGroup.FunctionTranslationCache]: {
-		cacheSourceLanguage: "auto",
-		cacheTargetLanguage: "zh-CHS",
-		cacheTranslationDomain: TranslationDomain.General,
-		cacheTranslationType: TranslationType.Youdao,
-	},
+
 	[AppSettingsGroup.FunctionOcr]: {
 		ocrModel: OcrModel.RapidOcrV4,
 	},
@@ -180,7 +162,7 @@ export const defaultAppSettingsData: AppSettingsData = {
 	},
 	[AppSettingsGroup.SystemCore]: {
 		/// 热加载页面数量
-		hotLoadPageCount: 0,
+		hotLoadPageCount: 1,
 	},
 	[AppSettingsGroup.FunctionGlobalShortcut]: {
 		disableOnFocusedFullScreenWindow: false,

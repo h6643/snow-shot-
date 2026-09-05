@@ -9,7 +9,6 @@ import type {
 	CommonKeyEventValue,
 } from "./core/commonKeyEvent";
 import { DrawState } from "./draw";
-import type { TranslationDomain, TranslationType } from "./servies/translation";
 import type { ImageFormat } from "./utils/file";
 
 export enum HistoryValidDuration {
@@ -45,16 +44,7 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-export enum TranslationApiType {
-	DeepL = "translation_api_deepl",
-}
 
-export type TranslationApiConfig = {
-	api_type: TranslationApiType;
-	api_uri: string;
-	api_key: string;
-	deepl_prefer_quality_optimized?: boolean;
-};
 
 export enum AppSettingsGroup {
 	Common = "common",
@@ -72,8 +62,6 @@ export enum AppSettingsGroup {
 	SystemCore = "systemCore",
 	SystemScrollScreenshot = "systemScrollScreenshot_20250628",
 	FunctionOcr = "functionOcr",
-	FunctionTranslation = "functionTranslation",
-	FunctionTranslationCache = "functionTranslationCache",
 	FunctionScreenshot = "functionScreenshot",
 	FunctionFullScreenDraw = "functionFullScreenDraw",
 	FunctionOutput = "functionOutput_20250908",
@@ -92,8 +80,6 @@ export enum ShortcutKeyStatus {
 
 export enum AppSettingsLanguage {
 	ZHHans = "zh-Hans",
-	ZHHant = "zh-Hant",
-	EN = "en",
 }
 
 export enum AppSettingsControlNode {
@@ -265,22 +251,6 @@ export type AppSettingsData = {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
 	};
-	[AppSettingsGroup.FunctionTranslation]: {
-		/** 优化 AI 翻译的排版 */
-		optimizeAiTranslationLayout: boolean;
-		translationSystemPrompt: string;
-		translationApiConfigList: TranslationApiConfig[];
-		sourceLanguage: string;
-		targetLanguage: string;
-		translationDomain: TranslationDomain;
-		translationType: TranslationType | string;
-	};
-	[AppSettingsGroup.FunctionTranslationCache]: {
-		cacheSourceLanguage: string;
-		cacheTargetLanguage: string;
-		cacheTranslationDomain: TranslationDomain;
-		cacheTranslationType: TranslationType | string;
-	};
 	[AppSettingsGroup.FunctionScreenshot]: {
 		/** 选取窗口子元素 */
 		findChildrenElements: boolean;
@@ -395,6 +365,5 @@ export const CanHiddenToolSet: Set<DrawState> = new Set([
 	DrawState.Redo,
 	DrawState.Fixed,
 	DrawState.OcrDetect,
-	DrawState.OcrTranslate,
 	DrawState.ScrollScreenshot,
 ]);

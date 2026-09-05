@@ -65,22 +65,6 @@ export const defaultDrawToolbarKeyEventSettings: Record<
 		hotKey: "Escape",
 		unique: true,
 	},
-	[DrawToolbarKeyEventKey.FixedTool]: {
-		hotKey: getPlatformValue("Ctrl+F", "Meta+F"),
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.CopyTool]: {
-		hotKey: getPlatformValue("Ctrl+C, Enter", "Meta+C, Enter"),
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.OcrDetectTool]: {
-		hotKey: getPlatformValue("Ctrl+D", "Meta+D"),
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.OcrTranslateTool]: {
-		hotKey: getPlatformValue("Ctrl+T", "Meta+T"),
-		unique: true,
-	},
 	[DrawToolbarKeyEventKey.ScrollScreenshotTool]: {
 		hotKey: "L",
 		unique: true,
@@ -136,22 +120,6 @@ export const defaultDrawToolbarKeyEventSettings: Record<
 	},
 	[DrawToolbarKeyEventKey.NextCapture]: {
 		hotKey: "Period",
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.ColorPickerMoveUp]: {
-		hotKey: "W, ArrowUp",
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.ColorPickerMoveDown]: {
-		hotKey: "S, ArrowDown",
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.ColorPickerMoveLeft]: {
-		hotKey: "A, ArrowLeft",
-		unique: true,
-	},
-	[DrawToolbarKeyEventKey.ColorPickerMoveRight]: {
-		hotKey: "D, ArrowRight",
 		unique: true,
 	},
 	[DrawToolbarKeyEventKey.LaserPointerTool]: {

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_layout")({
 
 function RouteComponent() {
 	return (
-		<RouterContainer autoInitPlugin={true}>
+		<RouterContainer>
 			<MenuLayout>
 				<Outlet />
 			</MenuLayout>

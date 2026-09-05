@@ -27,10 +27,8 @@ import {
 	LISTEN_KEY_SERVICE_MOUSE_UP_EMIT_KEY,
 	LISTEN_KEY_SERVICE_STOP_EMIT_KEY,
 } from "@/constants/eventListener";
-import { PLUGIN_EVENT_PLUGIN_STATUS_CHANGE } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
 	FIXED_CONTENT_FOCUS_MODE_CLOSE_ALL_WINDOW,
 	FIXED_CONTENT_FOCUS_MODE_CLOSE_OTHER_WINDOW,
@@ -161,8 +159,6 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 		}, 16 * 1000);
 	}, []);
 
-	const { refreshPluginStatusThrottle } = usePluginServiceContext();
-
 	useEffect(() => {
 		let detach: UnlistenFn;
 		attachConsole().then((d) => {
@@ -247,13 +243,6 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 			callback: listenKeyCallback(LISTEN_KEY_SERVICE_KEY_UP_EMIT_KEY),
 		});
 
-		defaultListener.push({
-			event: PLUGIN_EVENT_PLUGIN_STATUS_CHANGE,
-			callback: async () => {
-				refreshPluginStatusThrottle();
-			},
-		});
-
 		if (hasLayout) {
 			defaultListener.push({
 				event: "release-ocr-session",
@@ -266,14 +255,6 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 				callback: ({ payload }: { payload: LogMessageEvent }) => {
 					appLog(payload, undefined, "APP_TAURI");
 				},
-			});
-			defaultListener.push({
-				event: "execute-translate",
-				callback: async () => {},
-			});
-			defaultListener.push({
-				event: "execute-translate-selected-text",
-				callback: async () => {},
 			});
 			defaultListener.push({
 				event: "main-window:send-error-message",
@@ -440,7 +421,6 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 		isFullScreenDraw,
 		isFullScreenDrawSwitchMouseThrough,
 		releaseOcrSessionAction,
-		refreshPluginStatusThrottle,
 		isIdlePage,
 		isFixedContentPage,
 		hasLayout,

@@ -759,67 +759,6 @@ const ColorPickerCore: React.FC<{
 		};
 	}, [isDisableMouseMove, update]);
 
-	const moveCursor = useCallback(
-		(offsetX: number, offsetY: number) => {
-			const appWindow = appWindowRef.current;
-			if (!appWindow) {
-				return;
-			}
-
-			let mouseX = 0;
-			let mouseY = 0;
-			mouseX = pickerPositionRef.current.mouseX + offsetX;
-			mouseY = pickerPositionRef.current.mouseY + offsetY;
-
-			if (mouseX < 0) {
-				mouseX = 0;
-			} else if (mouseX > (captureBoundingBoxInfoRef.current?.width ?? 0)) {
-				mouseX = captureBoundingBoxInfoRef.current?.width ?? 0;
-			}
-
-			if (mouseY < 0) {
-				mouseY = 0;
-			} else if (
-				captureBoundingBoxInfoRef.current &&
-				mouseY > captureBoundingBoxInfoRef.current.height
-			) {
-				mouseY = captureBoundingBoxInfoRef.current.height;
-			}
-
-			disableMouseMove();
-			appWindow.setCursorPosition(new PhysicalPosition(mouseX, mouseY));
-			setDrawEvent({
-				event: DrawEvent.MoveCursor,
-				params: {
-					x: mouseX,
-					y: mouseY,
-				},
-			});
-			setDrawEvent(undefined);
-
-			// 在 macOS 下，鼠标移动不会触发 mousemove 事件，给 excalidraw 发送一个 mousemove 事件
-			if (getPlatform() === "macos") {
-				const canvas = getExcalidrawCanvas();
-				canvas?.dispatchEvent(
-					new PointerEvent("pointermove", {
-						clientX: Math.round(mouseX / window.devicePixelRatio),
-						clientY: Math.round(mouseY / window.devicePixelRatio),
-						bubbles: true,
-						cancelable: true,
-					}),
-				);
-			}
-
-			update(
-				Math.round(mouseX / window.devicePixelRatio),
-				Math.round(mouseY / window.devicePixelRatio),
-				mouseX,
-				mouseY,
-			);
-		},
-		[captureBoundingBoxInfoRef, disableMouseMove, setDrawEvent, update],
-	);
-
 	const switchCaptureHistory = useCallback(
 		async (item: CaptureHistoryItem | undefined) => {
 			const fileUri = item
@@ -891,38 +830,6 @@ const ColorPickerCore: React.FC<{
 						),
 					);
 					onCopyColor?.();
-				}}
-			>
-				<div />
-			</KeyEventWrap>
-			<KeyEventWrap
-				componentKey={DrawToolbarKeyEventKey.ColorPickerMoveUp}
-				onKeyDown={() => {
-					moveCursor(0, -1);
-				}}
-			>
-				<div />
-			</KeyEventWrap>
-			<KeyEventWrap
-				componentKey={DrawToolbarKeyEventKey.ColorPickerMoveDown}
-				onKeyDown={() => {
-					moveCursor(0, 1);
-				}}
-			>
-				<div />
-			</KeyEventWrap>
-			<KeyEventWrap
-				componentKey={DrawToolbarKeyEventKey.ColorPickerMoveLeft}
-				onKeyDown={() => {
-					moveCursor(-1, 0);
-				}}
-			>
-				<div />
-			</KeyEventWrap>
-			<KeyEventWrap
-				componentKey={DrawToolbarKeyEventKey.ColorPickerMoveRight}
-				onKeyDown={() => {
-					moveCursor(1, 0);
 				}}
 			>
 				<div />

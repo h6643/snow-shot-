@@ -18,15 +18,11 @@ import {
 	TrayIconLoader,
 	TrayIconStatePublisher,
 } from "@/components/trayIconLoader";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
-import { en } from "@/messages/en";
 import { zhHans } from "@/messages/zhHans";
-import { zhHant } from "@/messages/zhHant";
 import {
 	AppSettingsGroup,
 	AppSettingsLanguage,
@@ -47,26 +43,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 			return;
 		}
 
-		const zhHansKeys = Object.keys(zhHans);
-		const zhHantKeys = new Set(Object.keys(zhHant));
-		const enKeys = new Set(Object.keys(en));
-
-		const zhHantMissingKeys: Record<string, string> = {};
-		zhHansKeys
-			.filter((key) => !zhHantKeys.has(key))
-			.forEach((key) => {
-				zhHantMissingKeys[key] = zhHans[key as keyof typeof zhHans];
-			});
-
-		const enMissingKeys: Record<string, string> = {};
-		zhHansKeys
-			.filter((key) => !enKeys.has(key))
-			.forEach((key) => {
-				enMissingKeys[key] = zhHans[key as keyof typeof zhHans];
-			});
-
-		console.log("App zh-Hant missing messages: ", zhHantMissingKeys);
-		console.log("App en missing messages: ", enMissingKeys);
+		// Only zhHans is supported now
 	}, []);
 
 	const intl = useIntl();
@@ -85,14 +62,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 				const browserLanguage = navigator.language;
 				if (settingBrowserLanguage !== browserLanguage) {
 					// 切换语言
-					let language = AppSettingsLanguage.EN;
-					if (browserLanguage.startsWith("zh")) {
-						if (browserLanguage.startsWith("zh-TW")) {
-							language = AppSettingsLanguage.ZHHant;
-						} else {
-							language = AppSettingsLanguage.ZHHans;
-						}
-					}
+					const language = AppSettingsLanguage.ZHHans;
 
 					updateAppSettings(
 						AppSettingsGroup.Common,
@@ -111,7 +81,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 	);
 
 	const { token } = theme.useToken();
-	const { isReadyStatus } = usePluginServiceContext();
 	const router = useRouter();
 	const routes = useMemo(() => {
 		const routes: RouteItem[] = [
@@ -120,26 +89,8 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 				path: "/",
 				label: intl.formatMessage({ id: "menu.functions" }),
 				icon: <AppstoreOutlined />,
-				tabs: [
-					{
-						key: "screenshotFunction",
-						label: intl.formatMessage({ id: "home.screenshotFunction" }),
-					},
-					{
-						key: "translationFunction",
-						label: intl.formatMessage({ id: "home.translationFunction" }),
-					},
-					{
-						key: "otherFunction",
-						label: intl.formatMessage({ id: "home.otherFunction" }),
-					},
-				].filter((item) => {
-					if (item.key === "translationFunction") {
-						return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-					}
-
-					return true;
-				}),
+				hideTabs: true,
+				tabs: [],
 			},
 			{
 				key: "/tools",
@@ -148,18 +99,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 				icon: <ToolOutlined />,
 				tabs: [],
 				children: [
-					{
-						key: "/tools/translation",
-						path: "/tools/translation",
-						label: intl.formatMessage({ id: "menu.tools.translation" }),
-						hideTabs: true,
-						tabs: [
-							{
-								key: "translation",
-								label: intl.formatMessage({ id: "menu.tools.translation" }),
-							},
-						],
-					},
 					{
 						key: "/tools/captureHistory",
 						path: "/tools/captureHistory",
@@ -172,13 +111,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 							},
 						],
 					},
-				].filter((item) => {
-					if (item.key === "/tools/translation") {
-						return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-					}
-
-					return true;
-				}),
+				],
 			},
 			{
 				key: "/personalization",
@@ -199,20 +132,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								key: "appearance",
 								label: intl.formatMessage({
 									id: "menu.personalization.appearance",
-								}),
-							},
-						],
-					},
-					{
-						key: "/personalization/plugins",
-						path: "/personalization/plugins",
-						label: intl.formatMessage({ id: "menu.personalization.plugins" }),
-						hideTabs: true,
-						tabs: [
-							{
-								key: "plugins",
-								label: intl.formatMessage({
-									id: "menu.personalization.plugins",
 								}),
 							},
 						],
@@ -285,12 +204,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								}),
 							},
 							{
-								key: "translationSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.translationSettings",
-								}),
-							},
-							{
 								key: "fullScreenDrawSettings",
 								label: intl.formatMessage({
 									id: "settings.functionSettings.fullScreenDrawSettings",
@@ -314,13 +227,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 									id: "settings.functionSettings.outputSettings",
 								}),
 							},
-						].filter((item) => {
-							if (item.key === "translationSettings") {
-								return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-							}
-
-							return true;
-						}),
+						],
 					},
 					{
 						key: "/settings/systemSettings",
@@ -375,7 +282,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 		];
 
 		return routes;
-	}, [intl, isReadyStatus]);
+	}, [intl]);
 	const { menuItems, routeTabsMap } = useMemo(() => {
 		const routeTabsMap: Record<string, RouteMapItem> = {};
 

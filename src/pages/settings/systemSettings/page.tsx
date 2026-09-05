@@ -33,7 +33,6 @@ import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import { useStateRef } from "@/hooks/useStateRef";
@@ -210,8 +209,6 @@ export const SystemSettingsPage = () => {
 			setIsAdmin(result);
 		});
 	}, [setIsAdmin]);
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	return (
 		<ContentWrap>

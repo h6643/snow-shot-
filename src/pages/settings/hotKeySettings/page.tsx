@@ -14,9 +14,7 @@ import {
 	defaultDrawToolbarKeyEventComponentConfig,
 	defaultDrawToolbarKeyEventSettings,
 } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
@@ -69,8 +67,6 @@ export const HotKeySettingsPage = () => {
 
 	const [currentPlatform] = usePlatform();
 
-	const { isReadyStatus } = usePluginServiceContext();
-
 	const drawToolbarKeyEventFormItemList = useMemo(() => {
 		return Object.keys(defaultDrawToolbarKeyEventSettings)
 			.filter((key) => {
@@ -87,9 +83,6 @@ export const HotKeySettingsPage = () => {
 					}
 				}
 
-				if (key === DrawToolbarKeyEventKey.OcrTranslateTool) {
-					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-				}
 
 				return true;
 			})
@@ -133,11 +126,10 @@ export const HotKeySettingsPage = () => {
 					</Col>
 				);
 			});
-	}, [currentPlatform, drawToolbarKeyEvent, isReadyStatus, updateAppSettings]);
+	}, [currentPlatform, drawToolbarKeyEvent, updateAppSettings]);
 
 	const keyEventFormItemList = useMemo(() => {
 		const groupFormItemMap: Record<CommonKeyEventGroup, React.ReactNode[]> = {
-			[CommonKeyEventGroup.Translation]: [],
 			[CommonKeyEventGroup.FixedContent]: [],
 		};
 

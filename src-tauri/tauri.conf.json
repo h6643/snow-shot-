@@ -7,7 +7,7 @@
 	"build": {
 		"removeUnusedCommands": true,
 		"frontendDist": "../dist",
-		"devUrl": "http://localhost:8083",
+		"devUrl": "http://localhost:18083",
 		"beforeDevCommand": "pnpm dev",
 		"beforeBuildCommand": "pnpm build"
 	},
@@ -28,7 +28,7 @@
 				"decorations": true,
 				"titleBarStyle": "Overlay",
 				"visible": false,
-				"backgroundThrottling": "throttle",
+				"backgroundThrottling": "disabled",
 				"url": "/"
 			}
 		],

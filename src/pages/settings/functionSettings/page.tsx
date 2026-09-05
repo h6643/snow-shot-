@@ -1,23 +1,15 @@
 "use client";
 
 import ProForm, {
-	ProFormDependency,
-	ProFormList,
 	ProFormSelect,
 	ProFormSwitch,
-	ProFormText,
-	ProFormTextArea,
 } from "@ant-design/pro-form";
 import {
-	Alert,
 	Col,
 	Divider,
-	Flex,
 	Form,
 	Row,
-	Select,
 	Spin,
-	Typography,
 	theme,
 } from "antd";
 import { useCallback, useContext, useMemo, useState } from "react";
@@ -27,15 +19,9 @@ import { DirectoryInput } from "@/components/directoryInput";
 import { GroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/screenshot";
-import {
-	SOURCE_LANGUAGE_ENV_VARIABLE,
-	TARGET_LANGUAGE_ENV_VARIABLE,
-	TRANSLATION_DOMAIN_ENV_VARIABLE,
-} from "@/constants/components/translation";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
+
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
+
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import {
@@ -45,13 +31,12 @@ import {
 	DoubleClickAction,
 	OcrDetectAfterAction,
 	OcrModel,
-	TranslationApiType,
+
 	TrayIconClickAction,
 } from "@/types/appSettings";
 import { DrawState } from "@/types/draw";
-import { ImageFormat } from "@/types/utils/file";
 import { generateImageFileName, getImageSaveDirectory } from "@/utils/file";
-import { TranslationConfig } from "./components/translationConfig";
+
 
 export const FunctionSettingsPage = () => {
 	const intl = useIntl();
@@ -62,8 +47,7 @@ export const FunctionSettingsPage = () => {
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionTrayIcon]>();
-	const [translationForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionTranslation]>();
+
 	const [screenshotForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionScreenshot]>();
 	const [outputForm] =
@@ -85,17 +69,7 @@ export const FunctionSettingsPage = () => {
 			(settings: AppSettingsData, preSettings?: AppSettingsData) => {
 				setAppSettingsLoading(false);
 
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.FunctionTranslation] !==
-						settings[AppSettingsGroup.FunctionTranslation]
-				) {
-					translationForm.setFieldsValue(
-						settings[AppSettingsGroup.FunctionTranslation],
-					);
-				}
-
-				if (
+			if (
 					preSettings === undefined ||
 					preSettings[AppSettingsGroup.FunctionDraw] !==
 						settings[AppSettingsGroup.FunctionDraw]
@@ -183,7 +157,6 @@ export const FunctionSettingsPage = () => {
 				}
 			},
 			[
-				translationForm,
 				functionDrawForm,
 				screenshotForm,
 				outputForm,
@@ -196,8 +169,6 @@ export const FunctionSettingsPage = () => {
 		),
 		true,
 	);
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	const trayIconClickActionOptions = useMemo(() => {
 		return [
@@ -340,17 +311,6 @@ export const FunctionSettingsPage = () => {
 					id: "draw.laserPointerTool",
 				}),
 				value: DrawState.LaserPointer,
-			},
-		];
-	}, [intl]);
-
-	const translationApiTypeOptions = useMemo(() => {
-		return [
-			{
-				label: intl.formatMessage({
-					id: "settings.functionSettings.translationSettings.apiConfig.apiType.deepL",
-				}),
-				value: TranslationApiType.DeepL,
 			},
 		];
 	}, [intl]);
@@ -500,7 +460,7 @@ export const FunctionSettingsPage = () => {
 					</Row>
 
 					<Row gutter={token.marginLG}>
-						<Col span={12}>
+						<Col span={24}>
 							<ProFormSwitch
 								name="focusedWindowCopyToClipboard"
 								layout="horizontal"
@@ -509,8 +469,10 @@ export const FunctionSettingsPage = () => {
 								}
 							/>
 						</Col>
+					</Row>
 
-						<Col span={12}>
+					<Row gutter={token.marginLG}>
+						<Col span={24}>
 							<ProFormSwitch
 								name="fullScreenCopyToClipboard"
 								layout="horizontal"
@@ -581,40 +543,6 @@ export const FunctionSettingsPage = () => {
 								required={false}
 							>
 								<DirectoryInput />
-							</ProForm.Item>
-						</Col>
-
-						<Col span={12}>
-							<ProForm.Item
-								name="saveFileFormat"
-								label={
-									<FormattedMessage id="settings.functionSettings.screenshotSettings.autoSaveFileMode.saveFileFormat" />
-								}
-							>
-								<Select
-									options={[
-										{
-											label: "PNG(*.png)",
-											value: ImageFormat.PNG,
-										},
-										{
-											label: "JPEG(*.jpg)",
-											value: ImageFormat.JPEG,
-										},
-										{
-											label: "WEBP(*.webp)",
-											value: ImageFormat.WEBP,
-										},
-										{
-											label: "AVIF(*.avif)",
-											value: ImageFormat.AVIF,
-										},
-										{
-											label: "JPEG XL(*.jxl)",
-											value: ImageFormat.JPEG_XL,
-										},
-									]}
-								/>
 							</ProForm.Item>
 						</Col>
 					</Row>
@@ -874,248 +802,6 @@ export const FunctionSettingsPage = () => {
 				</>
 			}
 
-			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
-				<>
-					<Divider />
-
-					<GroupTitle
-						id="translationSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.translationSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionTranslation}
-							/>
-						}
-					>
-						<FormattedMessage id="settings.functionSettings.translationSettings" />
-					</GroupTitle>
-
-					<Spin spinning={appSettingsLoading}>
-						<TranslationConfig />
-
-						<ProForm
-							form={translationForm}
-							onValuesChange={(_, values) => {
-								updateAppSettings(
-									AppSettingsGroup.FunctionTranslation,
-									values,
-									true,
-									true,
-									true,
-									true,
-									false,
-								);
-							}}
-							submitter={false}
-						>
-							<Row gutter={token.marginLG}>
-								<Col span={12}>
-									<ProFormSwitch
-										name="optimizeAiTranslationLayout"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.optimizeAiTranslationLayout" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip" />
-												}
-											/>
-										}
-										layout="vertical"
-									/>
-								</Col>
-							</Row>
-
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<ProFormList
-										name="translationApiConfigList"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig" />
-												}
-											/>
-										}
-										creatorButtonProps={{
-											creatorButtonText: intl.formatMessage({
-												id: "settings.functionSettings.translationSettings.apiConfig.add",
-											}),
-										}}
-										className="api-config-list"
-										min={0}
-										itemRender={({ listDom, action }) => (
-											<Flex align="end" justify="space-between">
-												{listDom}
-
-												<div>{action}</div>
-											</Flex>
-										)}
-										creatorRecord={() => ({
-											api_uri: "",
-											api_key: "",
-											api_type: TranslationApiType.DeepL,
-										})}
-									>
-										<Row gutter={token.marginLG} style={{ width: "100%" }}>
-											<Col span={12}>
-												<ProFormSelect
-													name="api_type"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiType" />
-															}
-														/>
-													}
-													allowClear={false}
-													options={translationApiTypeOptions}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText
-													name="api_uri"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiUri" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiUri.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.translationSettings.apiConfig.apiUri.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText.Password
-													name="api_key"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiKey" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiKey.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.translationSettings.apiConfig.apiKey.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-
-											<ProFormDependency<{ api_type: TranslationApiType }>
-												name={["api_type"]}
-											>
-												{({ api_type }) => {
-													if (api_type === TranslationApiType.DeepL) {
-														return (
-															<Col span={12}>
-																<ProFormSwitch
-																	name="deepl_prefer_quality_optimized"
-																	label={
-																		<IconLabel
-																			label={
-																				<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized" />
-																			}
-																			tooltipTitle={
-																				<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized.tip" />
-																			}
-																		/>
-																	}
-																/>
-															</Col>
-														);
-													}
-
-													return null;
-												}}
-											</ProFormDependency>
-										</Row>
-									</ProFormList>
-								</Col>
-							</Row>
-
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<Alert
-										message={
-											<Typography>
-												<Row>
-													<Col span={24}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.variables" />
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.sourceLanguage" />
-														<code>{SOURCE_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.targetLanguage" />
-														<code>{TARGET_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.translationDomain" />
-														<code>{TRANSLATION_DOMAIN_ENV_VARIABLE}</code>
-													</Col>
-												</Row>
-											</Typography>
-										}
-										type="info"
-										style={{ marginBottom: token.margin }}
-									/>
-									<ProFormTextArea
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.tip" />
-												}
-											/>
-										}
-										layout="horizontal"
-										name="translationSystemPrompt"
-										rules={[
-											{
-												required: true,
-												message: intl.formatMessage({
-													id: "settings.functionSettings.translationSettings.chatPrompt.required",
-												}),
-											},
-										]}
-										fieldProps={{
-											autoSize: {
-												minRows: 1,
-												maxRows: 1,
-											},
-										}}
-									/>
-								</Col>
-							</Row>
-						</ProForm>
-					</Spin>
-				</>
-			)}
-
 			<Divider />
 
 			<GroupTitle
@@ -1258,224 +944,6 @@ export const FunctionSettingsPage = () => {
 				</ProForm>
 			</Spin>
 
-			<Divider />
-
-			<GroupTitle
-				id="outputSettings"
-				extra={
-					<ResetSettingsButton
-						title={
-							<FormattedMessage id="settings.functionSettings.outputSettings" />
-						}
-						appSettingsGroup={AppSettingsGroup.FunctionOutput}
-					/>
-				}
-			>
-				<FormattedMessage id="settings.functionSettings.outputSettings" />
-			</GroupTitle>
-
-			<Alert
-				message={
-					<Typography>
-						<Row>
-							<Col span={24}>
-								<FormattedMessage id="settings.functionSettings.outputSettings.variables" />
-							</Col>
-							<Col span={12}>
-								<FormattedMessage id="settings.functionSettings.outputSettings.variables.date" />
-								<code>{"{{YYYY-MM-DD_HH-mm-ss}}"}</code>
-							</Col>
-							<Col span={12}>
-								<FormattedMessage id="settings.functionSettings.outputSettings.variables.focusedWindowAppName" />
-								<code>{FOCUS_WINDOW_APP_NAME_ENV_VARIABLE}</code>
-							</Col>
-						</Row>
-					</Typography>
-				}
-				type="info"
-				style={{ marginBottom: token.margin }}
-			/>
-
-			<Spin spinning={appSettingsLoading}>
-				<ProForm
-					form={outputForm}
-					onValuesChange={(_, values) => {
-						updateAppSettings(
-							AppSettingsGroup.FunctionOutput,
-							values,
-							true,
-							true,
-							true,
-							true,
-							false,
-						);
-					}}
-					submitter={false}
-					layout="horizontal"
-				>
-					<Row gutter={token.marginLG}>
-						<Col span={24}>
-							<ProFormText
-								name="manualSaveFileNameFormat"
-								layout="horizontal"
-								label={
-									<FormattedMessage id="settings.functionSettings.outputSettings.manualSaveFileNameFormat" />
-								}
-							/>
-						</Col>
-
-						<ProFormDependency<{ manualSaveFileNameFormat: string }>
-							name={["manualSaveFileNameFormat"]}
-						>
-							{({ manualSaveFileNameFormat }) => {
-								const text = generateImageFileName(manualSaveFileNameFormat);
-								return (
-									<Col span={24}>
-										<ProFormText
-											layout="horizontal"
-											readonly
-											label={
-												<FormattedMessage id="settings.functionSettings.outputSettings.manualSaveFileNameFormatPreview" />
-											}
-											fieldProps={{
-												value: text,
-											}}
-										/>
-									</Col>
-								);
-							}}
-						</ProFormDependency>
-
-						<Col span={24}>
-							<ProFormText
-								name="autoSaveFileNameFormat"
-								layout="horizontal"
-								label={
-									<FormattedMessage id="settings.functionSettings.outputSettings.autoSaveFileNameFormat" />
-								}
-							/>
-						</Col>
-
-						<ProFormDependency<{ autoSaveFileNameFormat: string }>
-							name={["autoSaveFileNameFormat"]}
-						>
-							{({ autoSaveFileNameFormat }) => {
-								const text = generateImageFileName(autoSaveFileNameFormat);
-								return (
-									<Col span={24}>
-										<ProFormText
-											layout="horizontal"
-											readonly
-											label={
-												<FormattedMessage id="settings.functionSettings.outputSettings.autoSaveFileNameFormatPreview" />
-											}
-											fieldProps={{
-												value: text,
-											}}
-										/>
-									</Col>
-								);
-							}}
-						</ProFormDependency>
-
-						<Col span={24}>
-							<ProFormText
-								name="fastSaveFileNameFormat"
-								layout="horizontal"
-								label={
-									<FormattedMessage id="settings.functionSettings.outputSettings.fastSaveFileNameFormat" />
-								}
-							/>
-						</Col>
-
-						<ProFormDependency<{ fastSaveFileNameFormat: string }>
-							name={["fastSaveFileNameFormat"]}
-						>
-							{({ fastSaveFileNameFormat }) => {
-								const text = generateImageFileName(fastSaveFileNameFormat);
-								return (
-									<Col span={24}>
-										<ProFormText
-											layout="horizontal"
-											readonly
-											label={
-												<FormattedMessage id="settings.functionSettings.outputSettings.fastSaveFileNameFormatPreview" />
-											}
-											fieldProps={{
-												value: text,
-											}}
-										/>
-									</Col>
-								);
-							}}
-						</ProFormDependency>
-
-						<Col span={24}>
-							<ProFormText
-								name="focusedWindowFileNameFormat"
-								layout="horizontal"
-								label={
-									<FormattedMessage id="settings.functionSettings.outputSettings.focusedWindowFileNameFormat" />
-								}
-							/>
-						</Col>
-
-						<ProFormDependency<{ focusedWindowFileNameFormat: string }>
-							name={["focusedWindowFileNameFormat"]}
-						>
-							{({ focusedWindowFileNameFormat }) => {
-								const text = generateImageFileName(focusedWindowFileNameFormat);
-								return (
-									<Col span={24}>
-										<ProFormText
-											layout="horizontal"
-											readonly
-											label={
-												<FormattedMessage id="settings.functionSettings.outputSettings.focusedWindowFileNameFormatPreview" />
-											}
-											fieldProps={{
-												value: text,
-											}}
-										/>
-									</Col>
-								);
-							}}
-						</ProFormDependency>
-
-						<Col span={24}>
-							<ProFormText
-								name="fullScreenFileNameFormat"
-								layout="horizontal"
-								label={
-									<FormattedMessage id="settings.functionSettings.outputSettings.fullScreenFileNameFormat" />
-								}
-							/>
-						</Col>
-
-						<ProFormDependency<{ fullScreenFileNameFormat: string }>
-							name={["fullScreenFileNameFormat"]}
-						>
-							{({ fullScreenFileNameFormat }) => {
-								const text = generateImageFileName(fullScreenFileNameFormat);
-								return (
-									<Col span={24}>
-										<ProFormText
-											layout="horizontal"
-											readonly
-											label={
-												<FormattedMessage id="settings.functionSettings.outputSettings.fullScreenFileNameFormatPreview" />
-											}
-											fieldProps={{
-												value: text,
-											}}
-										/>
-									</Col>
-								);
-							}}
-						</ProFormDependency>
-					</Row>
-				</ProForm>
-			</Spin>
 
 			<style jsx>{`
                 :global(.api-config-list .ant-pro-form-list-container) {

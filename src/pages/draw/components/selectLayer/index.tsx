@@ -1377,21 +1377,6 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 		onMouseUp,
 		onMouseWheelRenderCallback,
 	]);
-	useStateSubscriber(
-		DrawEventPublisher,
-		useCallback(
-			(drawEvent: DrawEventParams | undefined) => {
-				if (drawEvent?.event === DrawEvent.MoveCursor) {
-					disableMouseMove();
-
-					onMouseMoveRenderCallback(
-						new MousePosition(drawEvent.params.x, drawEvent.params.y),
-					);
-				}
-			},
-			[disableMouseMove, onMouseMoveRenderCallback],
-		),
-	);
 
 	// 选择状态未激活时，鼠标在选区边框附件依旧可以更改选区
 	useEffect(() => {

@@ -97,7 +97,6 @@ export const ScreenshotTypePublisher = createPublisher<{
 
 export enum DrawEvent {
 	ScrollScreenshot = 1,
-	MoveCursor = 2,
 	/** 选区所在的 monitor 发生变化，可能相同值重复触发 */
 	ChangeMonitor = 3,
 	/** 选区参数动画发生变化 */
@@ -112,13 +111,6 @@ export type DrawEventParams =
 	| {
 			event: DrawEvent.ScrollScreenshot;
 			params: undefined;
-	  }
-	| {
-			event: DrawEvent.MoveCursor;
-			params: {
-				x: number;
-				y: number;
-			};
 	  }
 	| {
 			event: DrawEvent.ChangeMonitor;

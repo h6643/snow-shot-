@@ -122,38 +122,6 @@ jobs:
                   node-version: 20
                   cache: pnpm
 
-            # 安装 yarn
-            - name: Install yarn
-              run: npm install -g yarn
-
-            # 准备 Excalidraw 依赖
-            - name: Clone Excalidraw
-              run: |
-                  cd ..
-                  git clone https://github.com/mg-chao/excalidraw.git
-                  cd excalidraw
-                  git checkout custom/master
-              shell: bash
-
-            # 配置 yarn 缓存
-            - name: Cache yarn dependencies
-              uses: actions/cache@v4
-              with:
-                  path: |
-                      ~/.yarn/cache
-                      ~/.cache/yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            # 安装 Excalidraw 依赖
-            - name: Install Excalidraw dependencies
-              run: |
-                  cd ../excalidraw
-                  yarn install --frozen-lockfile
-                  cd "$GITHUB_WORKSPACE"
-              shell: bash
-
             # 创建 .env 文件以支持联网功能
             - name: Create .env file
               run: |
@@ -166,16 +134,12 @@ jobs:
 
             # 安装前端依赖并打包
             - name: Install app dependencies and build web
-              run: pnpm install --frozen-lockfile
+              run: pnpm install --no-frozen-lockfile
 
             # 安装 offline 版本额外依赖
             - name: Install offline version dependencies
               if: matrix.offline == true
               run: pnpm install qr-scanner-wechat@0.1.3
-
-            # 构建 Excalidraw
-            - name: Build Excalidraw
-              run: pnpm update:excalidraw
 
             # 下载 offline 资源 (Windows offline only)
             - name: Download and setup offline resources

@@ -17,9 +17,7 @@ import {
 	defaultDrawToolbarKeyEventComponentConfig,
 	defaultDrawToolbarKeyEventSettings,
 } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import {
@@ -27,11 +25,7 @@ import {
 	AppSettingsGroup,
 	ShortcutKeyStatus,
 } from "@/types/appSettings";
-import {
-	AppFunction,
-	type AppFunctionConfig,
-	AppFunctionGroup,
-} from "@/types/components/appFunction";
+import { AppFunction } from "@/types/components/appFunction";
 import { DrawToolbarKeyEventKey } from "@/types/components/drawToolbar";
 import {
 	CommonKeyEventGroup,
@@ -47,23 +41,14 @@ export const HomePage = () => {
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
 
-	const resetFliter = useCallback((group: AppFunctionGroup) => {
-		return (settings: Record<string, unknown>) => {
-			const newSettings: Partial<
+	const resetAllFilter = useCallback(
+		(settings: Record<string, unknown>) => {
+			return settings as Partial<
 				AppSettingsData[AppSettingsGroup.AppFunction]
-			> = {};
-
-			Object.keys(settings).forEach((key) => {
-				if ((settings[key] as AppFunctionConfig).group !== group) {
-					return;
-				}
-
-				newSettings[key as AppFunction] = settings[key] as AppFunctionConfig;
-			});
-
-			return newSettings;
-		};
-	}, []);
+			>;
+		},
+		[],
+	);
 
 	const [currentPlatform] = usePlatform();
 
@@ -75,8 +60,6 @@ export const HomePage = () => {
 		shortcutKeyStatus,
 		disableShortcutKeyRef,
 	} = useContext(GlobalShortcutContext);
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	// In-app hotkeys state
 	const [hotKeySettingsLoading, setHotKeySettingsLoading] = useState(true);
@@ -131,9 +114,6 @@ export const HomePage = () => {
 					}
 				}
 
-				if (key === DrawToolbarKeyEventKey.OcrTranslateTool) {
-					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-				}
 
 				return true;
 			})
@@ -177,11 +157,10 @@ export const HomePage = () => {
 					</Col>
 				);
 			});
-	}, [currentPlatform, drawToolbarKeyEvent, isReadyStatus, updateAppSettings]);
+	}, [currentPlatform, drawToolbarKeyEvent, updateAppSettings]);
 
 	const keyEventFormItemList = useMemo(() => {
 		const groupFormItemMap: Record<CommonKeyEventGroup, React.ReactNode[]> = {
-			[CommonKeyEventGroup.Translation]: [],
 			[CommonKeyEventGroup.FixedContent]: [],
 		};
 
@@ -240,208 +219,132 @@ export const HomePage = () => {
 			<CheckPermissions />
 
 			{/* Global Shortcuts */}
-			{Object.keys(defaultAppFunctionComponentGroupConfigs)
-				.filter((group) => {
-					if (group === AppFunctionGroup.Translation) {
-						return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
+			<div style={{ marginBottom: token.marginLG }}>
+				<GroupTitle
+					id="commonFunction"
+					extra={
+						<ResetSettingsButton
+							title={<FormattedMessage id="home.commonFunction" />}
+							appSettingsGroup={AppSettingsGroup.AppFunction}
+							filter={resetAllFilter}
+						/>
 					}
+				>
+					<FormattedMessage id="home.commonFunction" />
+				</GroupTitle>
+				<Spin spinning={updateShortcutKeyStatusLoading || appSettingsLoading}>
+					<Space
+						direction="vertical"
+						size="middle"
+						style={{ display: "flex" }}
+					>
+						{Object.values(defaultAppFunctionComponentGroupConfigs)
+							.flat()
+							.filter((config) => {
+								if (
+									currentPlatform === "macos" &&
+									config.configKey === AppFunction.TopWindow
+								) {
+									return false;
+								}
 
-					return true;
-				})
-				.map((group) => {
-					const configs =
-						defaultAppFunctionComponentGroupConfigs[group as AppFunctionGroup];
+								// 隐藏"固定剪贴板内容到屏幕"，避免与"固定到屏幕"混淆
+								if (config.configKey === AppFunction.FixedContent) {
+									return false;
+								}
 
-					let groupTitle: React.ReactNode;
-					switch (group) {
-						case AppFunctionGroup.Screenshot:
-							groupTitle = (
-								<GroupTitle
-									id="screenshotFunction"
-									extra={
-										<ResetSettingsButton
-											title={
-												<FormattedMessage
-													id="home.screenshotFunction"
-													key="screenshotFunction"
-												/>
-											}
-											appSettingsGroup={AppSettingsGroup.AppFunction}
-											filter={resetFliter(AppFunctionGroup.Screenshot)}
-										/>
-									}
-								>
-									<FormattedMessage
-										id="home.screenshotFunction"
-										key="screenshotFunction"
-									/>
-								</GroupTitle>
-							);
-							break;
-						case AppFunctionGroup.Translation:
-							groupTitle = (
-								<GroupTitle
-									id="translationFunction"
-									extra={
-										<ResetSettingsButton
-											title={<FormattedMessage id="home.translationFunction" />}
-											appSettingsGroup={AppSettingsGroup.AppFunction}
-											filter={resetFliter(AppFunctionGroup.Translation)}
-										/>
-									}
-								>
-									<FormattedMessage
-										id="home.translationFunction"
-										key="translationFunction"
-									/>
-								</GroupTitle>
-							);
-							break;
-						case AppFunctionGroup.Other:
-							groupTitle = (
-								<GroupTitle
-									id="otherFunction"
-									extra={
-										<ResetSettingsButton
-											title={<FormattedMessage id="home.otherFunction" />}
-											appSettingsGroup={AppSettingsGroup.AppFunction}
-											filter={resetFliter(AppFunctionGroup.Other)}
-										/>
-									}
-								>
-									<FormattedMessage
-										id="home.otherFunction"
-										key="otherFunction"
-									/>
-								</GroupTitle>
-							);
-							break;
-					}
+								return true;
+							})
+							.map((config) => {
+								const key = config.configKey;
+								const currentShortcutKey =
+									appFunctionSettings?.[key as AppFunction]?.shortcutKey;
+								const statusColor = appSettingsLoading
+									? undefined
+									: convertShortcutKeyStatusToButtonColor(
+											shortcutKeyStatus?.[key as AppFunction],
+										);
 
-					let speicalKeys: string[] | undefined;
-					switch (group) {
-						case AppFunctionGroup.Screenshot:
-						case AppFunctionGroup.Translation:
-						case AppFunctionGroup.Other:
-							speicalKeys = ["PrintScreen"];
-							break;
-					}
+								const statusTip = appSettingsLoading
+									? undefined
+									: convertShortcutKeyStatusToTip(
+											shortcutKeyStatus?.[key as AppFunction],
+										);
 
-					return (
-						<div key={`${group}`} style={{ marginBottom: token.marginLG }}>
-							{groupTitle}
-							<Spin
-								key={`${group}`}
-								spinning={updateShortcutKeyStatusLoading || appSettingsLoading}
-							>
-								<Space
-									direction="vertical"
-									size="middle"
-									style={{ display: "flex" }}
-								>
-									{configs
-										.filter((config) => {
-											if (
-												currentPlatform === "macos" &&
-												config.configKey === AppFunction.TopWindow
-											) {
-												return false;
-											}
+								let children = <></>;
+								if (
+									shortcutKeyStatus?.[key as AppFunction] ===
+									ShortcutKeyStatus.None
+								) {
+									children = (
+										<div
+											style={{
+												color: token.colorTextDescription,
+											}}
+										>
+											<FormattedMessage id="home.shortcut.none" />
+										</div>
+									);
+								} else if (statusTip) {
+									children = (
+										<Tooltip
+											title={convertShortcutKeyStatusToTip(
+												shortcutKeyStatus?.[key as AppFunction],
+											)}
+										>
+											<InfoCircleOutlined />
+										</Tooltip>
+									);
+								}
 
-											return true;
-										})
-										.map((config) => {
-											const key = config.configKey;
-											const currentShortcutKey =
-												appFunctionSettings?.[key as AppFunction]?.shortcutKey;
-											const statusColor = appSettingsLoading
-												? undefined
-												: convertShortcutKeyStatusToButtonColor(
-														shortcutKeyStatus?.[key as AppFunction],
+								return (
+									<div key={`${key}`}>
+										<FunctionButton
+											label={config.title}
+											icon={config.icon}
+											onClick={config.onClick}
+										>
+											<KeyButton
+												speicalKeys={["PrintScreen"]}
+												title={config.title}
+												maxWidth={200}
+												keyValue={currentShortcutKey ?? ""}
+												buttonProps={{
+													variant: "dashed",
+													color: statusColor,
+													children,
+													onClick: () => {
+														disableShortcutKeyRef.current = true;
+													},
+												}}
+												onCancel={() => {
+													disableShortcutKeyRef.current = false;
+												}}
+												onKeyChange={async (value) => {
+													disableShortcutKeyRef.current = false;
+													updateAppSettings(
+														AppSettingsGroup.AppFunction,
+														{
+															[key as AppFunction]: {
+																...appFunctionSettings,
+																shortcutKey: value,
+															},
+														},
+														false,
+														true,
+														false,
+														false,
 													);
-
-											const statusTip = appSettingsLoading
-												? undefined
-												: convertShortcutKeyStatusToTip(
-														shortcutKeyStatus?.[key as AppFunction],
-													);
-
-											let children = <></>;
-											if (
-												shortcutKeyStatus?.[key as AppFunction] ===
-												ShortcutKeyStatus.None
-											) {
-												children = (
-													<div
-														style={{
-															color: token.colorTextDescription,
-														}}
-													>
-														<FormattedMessage id="home.shortcut.none" />
-													</div>
-												);
-											} else if (statusTip) {
-												children = (
-													<Tooltip
-														title={convertShortcutKeyStatusToTip(
-															shortcutKeyStatus?.[key as AppFunction],
-														)}
-													>
-														<InfoCircleOutlined />
-													</Tooltip>
-												);
-											}
-
-											return (
-												<div key={`${group}-${key}`}>
-													<FunctionButton
-														label={config.title}
-														icon={config.icon}
-														onClick={config.onClick}
-													>
-														<KeyButton
-															speicalKeys={speicalKeys}
-															title={config.title}
-															maxWidth={200}
-															keyValue={currentShortcutKey ?? ""}
-															buttonProps={{
-																variant: "dashed",
-																color: statusColor,
-																children,
-																onClick: () => {
-																	disableShortcutKeyRef.current = true;
-																},
-															}}
-															onCancel={() => {
-																disableShortcutKeyRef.current = false;
-															}}
-															onKeyChange={async (value) => {
-																disableShortcutKeyRef.current = false;
-																updateAppSettings(
-																	AppSettingsGroup.AppFunction,
-																	{
-																		[key as AppFunction]: {
-																			...appFunctionSettings,
-																			shortcutKey: value,
-																		},
-																	},
-																	false,
-																	true,
-																	false,
-																	false,
-																);
-															}}
-															maxLength={1}
-														/>
-													</FunctionButton>
-												</div>
-											);
-										})}
-								</Space>
-							</Spin>
-						</div>
-					);
-				})}
+												}}
+												maxLength={1}
+											/>
+										</FunctionButton>
+									</div>
+								);
+							})}
+					</Space>
+				</Spin>
+			</div>
 
 			<Divider />
 

@@ -234,7 +234,6 @@ pub async fn create_fixed_content_window(
     .resizable(false)
     .inner_size(500.0, 500.0)
     .position(0.0, 0.0)
-    .additional_browser_args("--js-flags=--max-old-space-size=256")
 
     .build()
     .unwrap();
@@ -333,7 +332,6 @@ pub async fn create_full_screen_draw_window(
                 .skip_taskbar(true)
                 .resizable(false)
                 .focused(true)
-                .additional_browser_args("--js-flags=--max-old-space-size=256")
 
                 .build()
                 .unwrap(),
@@ -383,7 +381,6 @@ pub async fn create_full_screen_draw_window(
                 .transparent(true)
                 .skip_taskbar(true)
                 .resizable(false)
-                .additional_browser_args("--js-flags=--max-old-space-size=256")
 
                 .build()
                 .unwrap(),
@@ -647,7 +644,6 @@ pub async fn create_video_record_window(
                 .skip_taskbar(true)
                 .resizable(false)
                 .visible(false)
-                .additional_browser_args("--js-flags=--max-old-space-size=256")
 
                 .build()
                 .unwrap(),
@@ -695,7 +691,6 @@ pub async fn create_video_record_window(
                 .skip_taskbar(true)
                 .resizable(false)
                 .visible(false)
-                .additional_browser_args("--js-flags=--max-old-space-size=256")
 
                 .build()
                 .unwrap(),

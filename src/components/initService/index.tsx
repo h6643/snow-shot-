@@ -101,7 +101,7 @@ export const InitService = () => {
 			hasInitHotLoadPage.current = true;
 
 			hotLoadPageInit(
-				Math.min(appSettings[AppSettingsGroup.SystemCore].hotLoadPageCount, 0),
+				Math.min(appSettings[AppSettingsGroup.SystemCore].hotLoadPageCount, 3),
 			);
 		}
 	}, [appSettings, clearCaptureHistory, prevAppSettings]);

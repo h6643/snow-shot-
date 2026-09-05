@@ -32,24 +32,18 @@ import {
 	FullScreenDrawIcon,
 	FullScreenIcon,
 	OcrDetectIcon,
-	OcrTranslateIcon,
 	ScreenshotIcon,
-	SelectTextIcon,
 	TopWindowIcon,
-	TranslationIcon,
 } from "@/components/icons";
 import { TrayIconStatePublisher } from "@/components/trayIconLoader";
 import { defaultAppFunctionConfigs } from "@/constants/appFunction";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
+
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
 	executeScreenshot,
 	executeScreenshotFocusedWindow,
 } from "@/functions/screenshot";
 import {
-	executeTranslate,
-	executeTranslateSelectedText,
 	openCaptureHistory,
 	openImageSaveFolder,
 	showOrHideMainWindow,
@@ -109,7 +103,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 		undefined,
 	);
 
-	const { isReadyStatus } = usePluginServiceContext();
 	const {
 		configs: defaultAppFunctionComponentConfigs,
 		groupConfigs: defaultAppFunctionComponentGroupConfigs,
@@ -119,14 +112,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 	} = useMemo(() => {
 		const configs = Object.keys(defaultAppFunctionConfigs)
 			.filter((key) => {
-				if (key === AppFunction.Translation) {
-					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-				}
-
-				if (key === AppFunction.ScreenshotOcrTranslate) {
-					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-				}
-
 				return true;
 			})
 			.reduce(
@@ -144,12 +129,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonTitle = <FormattedMessage id="draw.ocrDetectTool" />;
 							buttonIcon = <OcrDetectIcon />;
 							buttonOnClick = () => executeScreenshot(ScreenshotType.OcrDetect);
-							break;
-						case AppFunction.ScreenshotOcrTranslate:
-							buttonTitle = <FormattedMessage id="draw.ocrTranslateTool" />;
-							buttonIcon = <OcrTranslateIcon style={{ fontSize: "1.2em" }} />;
-							buttonOnClick = () =>
-								executeScreenshot(ScreenshotType.OcrTranslate);
 							break;
 						case AppFunction.ScreenshotFullScreen:
 							buttonTitle = (
@@ -170,22 +149,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonIcon = <FocusedWindowIcon />;
 							buttonOnClick = async () => {
 								executeScreenshotFocusedWindow(getAppSettings());
-							};
-							break;
-						case AppFunction.TranslationSelectText:
-							buttonTitle = (
-								<FormattedMessage id="home.translationSelectText" />
-							);
-							buttonIcon = <SelectTextIcon style={{ fontSize: "1em" }} />;
-							buttonOnClick = async () => {
-								executeTranslateSelectedText();
-							};
-							break;
-						case AppFunction.Translation:
-							buttonTitle = <FormattedMessage id="home.translation" />;
-							buttonIcon = <TranslationIcon />;
-							buttonOnClick = () => {
-								executeTranslate();
 							};
 							break;
 						case AppFunction.TopWindow:
@@ -312,7 +275,7 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 		);
 
 		return { configs, groupConfigs };
-	}, [getAppSettings, getTrayIconState, isReadyStatus]);
+	}, [getAppSettings, getTrayIconState]);
 
 	const [shortcutKeyStatus, setShortcutKeyStatus] =
 		useState<Record<AppFunction, ShortcutKeyStatus>>();
@@ -393,7 +356,7 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 
 	const updateShortcutKeyStatusPendingRef = useRef(false);
 	useDeepCompareEffect(() => {
-		if (!appFunctionSettings || !isReadyStatus) {
+		if (!appFunctionSettings) {
 			return;
 		}
 
@@ -405,7 +368,7 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 		updateShortcutKeyStatus(appFunctionSettings).then(() => {
 			updateShortcutKeyStatusPendingRef.current = false;
 		});
-	}, [appFunctionSettings, isReadyStatus, updateShortcutKeyStatus]);
+	}, [appFunctionSettings, updateShortcutKeyStatus]);
 
 	const contextValue = useMemo((): GlobalShortcutContextType => {
 		return {

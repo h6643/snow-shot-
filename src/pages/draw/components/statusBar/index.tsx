@@ -197,10 +197,6 @@ const StatusBar: React.FC = () => {
 
 		const {
 			colorPickerCopy: { hotKey: colorPickerCopyHotKey },
-			colorPickerMoveUp: { hotKey: colorPickerMoveUpHotKey },
-			colorPickerMoveDown: { hotKey: colorPickerMoveDownHotKey },
-			colorPickerMoveLeft: { hotKey: colorPickerMoveLeftHotKey },
-			colorPickerMoveRight: { hotKey: colorPickerMoveRightHotKey },
 			maintainAspectRatioPicker: { hotKey: maintainAspectRatioPickerHotKey },
 			rotateWithDiscreteAnglePicker: {
 				hotKey: rotateWithDiscreteAnglePickerHotKey,
@@ -220,28 +216,7 @@ const StatusBar: React.FC = () => {
 			getAppSettings()[AppSettingsGroup.FunctionScreenshot]
 				.findChildrenElements;
 
-		const items: DescriptionsItemType[] = [
-			{
-				key: "colorPickerMoveUp",
-				label: <FormattedMessage id="draw.colorPickerMoveUp" />,
-				children: <KeyLabel hotKey={colorPickerMoveUpHotKey} />,
-			},
-			{
-				key: "colorPickerMoveDown",
-				label: <FormattedMessage id="draw.colorPickerMoveDown" />,
-				children: <KeyLabel hotKey={colorPickerMoveDownHotKey} />,
-			},
-			{
-				key: "colorPickerMoveLeft",
-				label: <FormattedMessage id="draw.colorPickerMoveLeft" />,
-				children: <KeyLabel hotKey={colorPickerMoveLeftHotKey} />,
-			},
-			{
-				key: "colorPickerMoveRight",
-				label: <FormattedMessage id="draw.colorPickerMoveRight" />,
-				children: <KeyLabel hotKey={colorPickerMoveRightHotKey} />,
-			},
-		];
+		const items: DescriptionsItemType[] = [];
 
 		const captureStep = getCaptureStep();
 		const drawState = getDrawState();

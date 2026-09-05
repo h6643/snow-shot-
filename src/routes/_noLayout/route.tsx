@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_noLayout")({
 
 function PathlessLayoutComponent() {
 	return (
-		<RouterContainer autoInitPlugin={false}>
+		<RouterContainer>
 			<Outlet />
 		</RouterContainer>
 	);

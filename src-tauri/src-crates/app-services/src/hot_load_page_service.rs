@@ -79,7 +79,6 @@ impl HotLoadPageService {
         .position(0.0, 0.0)
         .visible(false)
         .focused(false)
-        .additional_browser_args("--js-flags=--max-old-space-size=256")
 
         .build()
         {

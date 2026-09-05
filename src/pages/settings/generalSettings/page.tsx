@@ -25,7 +25,6 @@ import { IconLabel } from "@/components/iconLable";
 import { DarkModeIcon, LanguageIcon } from "@/components/icons";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { useStateRef } from "@/hooks/useStateRef";
 import {
@@ -105,13 +104,7 @@ export const GeneralSettingsPage = () => {
 		true,
 	);
 
-	const { isReadyStatus } = usePluginServiceContext();
-
 	const customToolbarToolListOptions = useMemo(() => {
-		if (!isReadyStatus) {
-			return [];
-		}
-
 		return [
 			{
 				label: intl.formatMessage({ id: "draw.selectTool" }),
@@ -166,17 +159,13 @@ export const GeneralSettingsPage = () => {
 				value: DrawState.OcrDetect,
 			},
 			{
-				label: intl.formatMessage({ id: "draw.ocrTranslateTool" }),
-				value: DrawState.OcrTranslate,
-			},
-			{
 				label: intl.formatMessage({ id: "draw.scrollScreenshotTool" }),
 				value: DrawState.ScrollScreenshot,
 			},
 		].filter((_item) => {
 			return true;
 		});
-	}, [intl, isReadyStatus]);
+	}, [intl]);
 
 	const themeOptions = useMemo(() => {
 		return [
@@ -251,8 +240,6 @@ export const GeneralSettingsPage = () => {
 								rules={[{ required: true }]}
 							>
 								<Select>
-									<Option value={AppSettingsLanguage.EN}>English</Option>
-									<Option value={AppSettingsLanguage.ZHHant}>繁体中文</Option>
 									<Option value={AppSettingsLanguage.ZHHans}>简体中文</Option>
 								</Select>
 							</Form.Item>

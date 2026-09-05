@@ -1,24 +1,13 @@
-import {
-	useCallback,
-	useContext,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
-import { useIntl } from "react-intl";
+import { useCallback, useContext, useImperativeHandle, useRef } from "react";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
-import { AntdContext } from "@/contexts/antdContext";
+
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
 	type AllOcrResult,
-	type AppOcrResult,
 	covertOcrResultToText,
 	OcrResult,
 	type OcrResultActionType,
-	type OcrResultType,
 } from "@/pages/fixedContent/components/ocrResult";
 import { AppSettingsGroup, OcrDetectAfterAction } from "@/types/appSettings";
 import type { OcrDetectResult } from "@/types/commands/ocr";
@@ -32,7 +21,7 @@ import {
 	ScreenshotTypePublisher,
 } from "../../extra";
 import { DrawContext } from "../../types";
-import OcrTool, { isOcrTool } from "../drawToolbar/components/tools/ocrTool";
+import { isOcrTool } from "../drawToolbar/components/tools/ocrTool";
 
 export type OcrBlocksSelectedText = {
 	type: "text";
@@ -128,58 +117,17 @@ export const OcrBlocks: React.FC<{
 					writeTextToClipboard(covertOcrResultToText(ocrResult));
 					finishCapture?.();
 				}
-			} else if (getDrawState() === DrawState.OcrTranslate) {
-				ocrResultActionRef.current?.startTranslate();
 			}
 		},
 		[finishCapture, getAppSettings, getDrawState, getScreenshotType],
 	);
 
-	const onTranslate = useCallback(() => {
-		ocrResultActionRef.current?.startTranslate();
-	}, []);
-
-	const _intl = useIntl();
-	const { message } = useContext(AntdContext);
-
-	const [currentOcrResult, setCurrentOcrResult] = useState<
-		(AppOcrResult & { ocrResultType: OcrResultType }) | undefined
-	>(undefined);
-	const [ocrResult, setOcrResult] = useState<AppOcrResult | undefined>(
-		undefined,
-	);
-	const [translatedOcrResult, setTranslatedOcrResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
-	const [translateLoading, setTranslateLoading] = useState(false);
-	const onSwitchOcrResult = useCallback((ocrResultType: OcrResultType) => {
-		ocrResultActionRef.current?.switchOcrResult(ocrResultType);
-	}, []);
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	return (
-		<>
-			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
-				<OcrTool
-					onSwitchOcrResult={onSwitchOcrResult}
-					onTranslate={onTranslate}
-					currentOcrResult={currentOcrResult}
-					ocrResult={ocrResult}
-					translatedOcrResult={translatedOcrResult}
-					translateLoading={translateLoading}
-				/>
-			)}
-
-			<OcrResult
-				zIndex={zIndexs.Draw_OcrResult}
-				actionRef={ocrResultActionRef}
-				onOcrDetect={onOcrDetect}
-				onCurrentOcrResultChange={setCurrentOcrResult}
-				onOcrResultChange={setOcrResult}
-				onTranslatedResultChange={setTranslatedOcrResult}
-				onTranslateLoading={setTranslateLoading}
-			/>
-		</>
+		<OcrResult
+			zIndex={zIndexs.Draw_OcrResult}
+			actionRef={ocrResultActionRef}
+			onOcrDetect={onOcrDetect}
+		/>
 	);
 };

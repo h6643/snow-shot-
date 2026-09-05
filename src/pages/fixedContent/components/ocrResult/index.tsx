@@ -16,8 +16,6 @@ import { ocrDetect, ocrDetectWithSharedBuffer } from "@/commands/ocr";
 import { createWebViewSharedBufferChannel } from "@/commands/webview";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
-import { useTranslationRequest } from "@/core/translations";
 import { releaseOcrSession } from "@/functions/ocr";
 import { useHotkeysApp } from "@/hooks/useHotkeysApp";
 import { useStateRef } from "@/hooks/useStateRef";
@@ -35,10 +33,7 @@ import { appError } from "@/utils/log";
 import { getPlatformValue } from "@/utils/platform";
 import { randomString } from "@/utils/random";
 import { getWebViewSharedBuffer } from "@/utils/webview";
-import {
-	alignTranslatedBySourceProportion,
-	getOcrResultIframeSrcDoc,
-} from "./extra";
+import { getOcrResultIframeSrcDoc } from "./extra";
 
 // 定义角度阈值常量（以度为单位）
 const ROTATION_THRESHOLD = 3; // 小于3度的旋转被视为误差，不进行旋转
@@ -50,8 +45,7 @@ export type AppOcrResult = {
 
 export type AllOcrResult = {
 	ocrResult: AppOcrResult | undefined;
-	translatedResult: AppOcrResult | undefined;
-	currentOcrResultType: OcrResultType | undefined;
+	translatedResult: undefined;
 };
 
 export type OcrResultInitDrawCanvasParams = {
@@ -74,13 +68,9 @@ export type OcrResultActionType = {
 	setEnable: (enable: boolean | ((enable: boolean) => boolean)) => void;
 	setScale: (scale: number) => void;
 	clear: () => void;
-	getOcrResult: () =>
-		| (AppOcrResult & { ocrResultType: OcrResultType })
-		| undefined;
+	getOcrResult: () => AppOcrResult | undefined;
 	getAllOcrResult: () => AllOcrResult | undefined;
 	getSelectedText: () => OcrBlocksSelectedText | undefined;
-	startTranslate: () => void;
-	switchOcrResult: (ocrResultType: OcrResultType) => void;
 };
 
 export const covertOcrResultToText = (ocrResult: OcrDetectResult) => {
@@ -89,7 +79,6 @@ export const covertOcrResultToText = (ocrResult: OcrDetectResult) => {
 
 export enum OcrResultType {
 	Ocr = "ocr",
-	Translated = "translated",
 }
 
 export const OcrResult: React.FC<{
@@ -106,10 +95,8 @@ export const OcrResult: React.FC<{
 	onCurrentOcrResultChange?: (
 		ocrResult: (AppOcrResult & { ocrResultType: OcrResultType }) | undefined,
 	) => void;
-	onTranslatedResultChange?: (ocrResult: AppOcrResult | undefined) => void;
 	onOcrResultChange?: (ocrResult: AppOcrResult | undefined) => void;
 	style?: React.CSSProperties;
-	onTranslateLoading?: (loading: boolean) => void;
 }> = ({
 	zIndex,
 	actionRef,
@@ -122,10 +109,8 @@ export const OcrResult: React.FC<{
 	onMouseMove,
 	onMouseUp,
 	style,
-	onTranslatedResultChange,
 	onOcrResultChange,
 	onCurrentOcrResultChange,
-	onTranslateLoading,
 }) => {
 	const intl = useIntl();
 	const { token } = theme.useToken();
@@ -466,18 +451,14 @@ export const OcrResult: React.FC<{
 
 	/** 请求 ID，避免 OCR 检测中切换工具后仍然触发 OCR 结果 */
 	const requestIdRef = useRef<number>(0);
-	const { isReady } = usePluginServiceContext();
 
 	const [ocrResult, setOcrResult, ocrResultRef] = useStateRef<
 		AppOcrResult | undefined
 	>(undefined);
-	const [translatorOcrResult, setTranslatorOcrResult, translatorOcrResultRef] =
-		useStateRef<AppOcrResult | undefined>(undefined);
 	const initDrawCanvas = useCallback(
 		async (params: OcrResultInitDrawCanvasParams) => {
 			setCurrentOcrResult(undefined);
 			setOcrResult(undefined);
-			setTranslatorOcrResult(undefined);
 
 			requestIdRef.current++;
 			const currentRequestId = requestIdRef.current;
@@ -496,37 +477,14 @@ export const OcrResult: React.FC<{
 			if (params.allOcrResult) {
 				selectRectRef.current = selectRect;
 				setOcrResult(params.allOcrResult.ocrResult);
-				setTranslatorOcrResult(params.allOcrResult.translatedResult);
 
-				let targetOcrResult:
-					| (AppOcrResult & { ocrResultType: OcrResultType })
-					| undefined;
-				switch (params.allOcrResult.currentOcrResultType) {
-					case OcrResultType.Ocr:
-						if (params.allOcrResult.ocrResult) {
-							targetOcrResult = {
-								...params.allOcrResult.ocrResult,
-								ocrResultType: OcrResultType.Ocr,
-							};
-						}
-						break;
-					case OcrResultType.Translated:
-						if (params.allOcrResult.translatedResult) {
-							targetOcrResult = {
-								...params.allOcrResult.translatedResult,
-								ocrResultType: OcrResultType.Translated,
-							};
-						}
-						break;
-				}
-
-				if (targetOcrResult) {
+				if (params.allOcrResult.ocrResult) {
 					updateOcrTextElements(
-						targetOcrResult.result,
-						targetOcrResult.ignoreScale,
-						targetOcrResult.ocrResultType,
+						params.allOcrResult.ocrResult.result,
+						params.allOcrResult.ocrResult.ignoreScale,
+						OcrResultType.Ocr,
 					);
-					onOcrDetect?.(targetOcrResult.result);
+					onOcrDetect?.(params.allOcrResult.ocrResult.result);
 				}
 
 				return;
@@ -574,7 +532,6 @@ export const OcrResult: React.FC<{
 			updateOcrTextElements,
 			ocrDetectByCanvas,
 			setOcrResult,
-			setTranslatorOcrResult,
 			setCurrentOcrResult,
 			getAppSettings,
 		],
@@ -584,7 +541,6 @@ export const OcrResult: React.FC<{
 		async (params: OcrResultInitImageParams) => {
 			setCurrentOcrResult(undefined);
 			setOcrResult(undefined);
-			setTranslatorOcrResult(undefined);
 			const { canvas } = params;
 
 			selectRectRef.current = {
@@ -624,7 +580,6 @@ export const OcrResult: React.FC<{
 			updateOcrTextElements,
 			ocrDetectByCanvas,
 			setOcrResult,
-			setTranslatorOcrResult,
 			setCurrentOcrResult,
 		],
 	);
@@ -856,63 +811,6 @@ export const OcrResult: React.FC<{
 		[],
 	);
 
-	const { requestTranslate } = useTranslationRequest(
-		useMemo(() => {
-			return {
-				onComplete: (result, requestId) => {
-					if (requestId !== requestIdRef.current || !ocrResultRef.current) {
-						return;
-					}
-
-					const sourceTextList = ocrResultRef.current.result.text_blocks.map(
-						(block) => block.text,
-					);
-					const translatedTextList = result.map((item) => item.content);
-					let resultTextBlocks: string[] = [];
-					if (
-						sourceTextList.length > translatedTextList.length &&
-						getAppSettings()[AppSettingsGroup.FunctionTranslation]
-							.optimizeAiTranslationLayout
-					) {
-						resultTextBlocks = alignTranslatedBySourceProportion(
-							sourceTextList,
-							translatedTextList,
-						);
-					} else {
-						resultTextBlocks = translatedTextList;
-					}
-
-					const translatorOcrResult: AppOcrResult = {
-						ignoreScale: ocrResultRef.current.ignoreScale,
-						result: {
-							...ocrResultRef.current.result,
-							text_blocks: ocrResultRef.current.result.text_blocks.map(
-								(block, index) => ({
-									...block,
-									text: resultTextBlocks[index] ?? block.text,
-								}),
-							),
-						},
-					};
-
-					setTranslatorOcrResult(translatorOcrResult);
-					updateOcrTextElements(
-						translatorOcrResult.result,
-						translatorOcrResult.ignoreScale,
-						OcrResultType.Translated,
-					);
-				},
-				lazyLoad: true,
-			};
-		}, [
-			setTranslatorOcrResult,
-			ocrResultRef,
-			updateOcrTextElements,
-			getAppSettings,
-		]),
-	);
-
-	const requestTranslateLoadingIdRef = useRef<number | undefined>(undefined);
 	useImperativeHandle(
 		actionRef,
 		() => ({
@@ -944,76 +842,10 @@ export const OcrResult: React.FC<{
 				return currentOcrResultRef.current;
 			},
 			getSelectedText,
-			startTranslate: async () => {
-				if (
-					!ocrResultRef.current ||
-					ocrResultRef.current.result.text_blocks.length === 0
-				) {
-					message.error(intl.formatMessage({ id: "draw.ocrResultEmpty" }));
-					return;
-				}
-
-				if (
-					requestTranslateLoadingIdRef.current &&
-					requestTranslateLoadingIdRef.current === requestIdRef.current
-				) {
-					return;
-				}
-
-				setTranslatorOcrResult(undefined);
-
-				requestTranslateLoadingIdRef.current = requestIdRef.current;
-				const hideLoading = message.loading(
-					intl.formatMessage({ id: "draw.ocrResult.translating" }),
-					20,
-				);
-				onTranslateLoading?.(true);
-
-				try {
-					await requestTranslate(
-						ocrResultRef.current.result.text_blocks.map((block) => block.text),
-						requestIdRef.current,
-					);
-				} catch (error) {
-					appError("[OcrResult.startTranslate] requestTranslate error", error);
-					message.error(
-						intl.formatMessage({ id: "draw.ocrResult.translateError" }),
-					);
-				}
-
-				hideLoading();
-				requestTranslateLoadingIdRef.current = undefined;
-				onTranslateLoading?.(false);
-			},
-			switchOcrResult: (ocrResultType: OcrResultType) => {
-				if (ocrResultType === OcrResultType.Ocr && ocrResultRef.current) {
-					updateOcrTextElements(
-						ocrResultRef.current.result,
-						ocrResultRef.current.ignoreScale,
-						OcrResultType.Ocr,
-						{
-							ignoreResetValue: true,
-						},
-					);
-				} else if (
-					ocrResultType === OcrResultType.Translated &&
-					translatorOcrResultRef.current
-				) {
-					updateOcrTextElements(
-						translatorOcrResultRef.current.result,
-						translatorOcrResultRef.current.ignoreScale,
-						OcrResultType.Translated,
-						{
-							ignoreResetValue: true,
-						},
-					);
-				}
-			},
 			getAllOcrResult: () => {
 				return {
 					ocrResult: ocrResultRef.current,
-					translatedResult: translatorOcrResultRef.current,
-					currentOcrResultType: currentOcrResultRef.current?.ocrResultType,
+					translatedResult: undefined,
 				};
 			},
 		}),
@@ -1025,22 +857,15 @@ export const OcrResult: React.FC<{
 			setEnable,
 			setScale,
 			ocrResultRef,
-			requestTranslate,
-			setTranslatorOcrResult,
 			intl,
 			currentOcrResultRef,
-			translatorOcrResultRef,
 			updateOcrTextElements,
-			onTranslateLoading,
 		],
 	);
 
 	useEffect(() => {
 		onOcrResultChange?.(ocrResult);
 	}, [ocrResult, onOcrResultChange]);
-	useEffect(() => {
-		onTranslatedResultChange?.(translatorOcrResult);
-	}, [translatorOcrResult, onTranslatedResultChange]);
 	useEffect(() => {
 		onCurrentOcrResultChange?.(currentOcrResult);
 	}, [currentOcrResult, onCurrentOcrResultChange]);
@@ -1089,7 +914,6 @@ export const OcrResult: React.FC<{
 					className="ocr-result-text-iframe"
 					srcDoc={getOcrResultIframeSrcDoc(
 						textContainerContent,
-						currentOcrResult?.ocrResultType ?? OcrResultType.Ocr,
 						enableDrag,
 						enableCopy,
 						token,

@@ -1088,11 +1088,7 @@ const DrawPageCore: React.FC<{
 			isOcrTool(getDrawState()) &&
 			getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText
 		) {
-			if (
-				ocrResult &&
-				(ocrResult.ocrResultType === OcrResultType.Ocr ||
-					ocrResult.ocrResultType === OcrResultType.Translated)
-			) {
+			if (ocrResult) {
 				writeTextToClipboard(covertOcrResultToText(ocrResult.result));
 			}
 
