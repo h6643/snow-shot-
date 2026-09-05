@@ -11,6 +11,7 @@ use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::codecs::webp::WebPEncoder;
 use image::{DynamicImage, GenericImageView};
+#[cfg(target_os = "linux")]
 use image::imageops;
 use snow_shot_app_shared::ElementRect;
 use tauri::AppHandle;
