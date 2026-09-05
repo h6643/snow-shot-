@@ -1,4 +1,4 @@
-import { join as joinPath, pictureDir, videoDir } from "@tauri-apps/api/path";
+import { join as joinPath, pictureDir } from "@tauri-apps/api/path";
 import * as dialog from "@tauri-apps/plugin-dialog";
 import dayjs from "dayjs";
 import { createDir } from "@/commands/file";
@@ -199,17 +199,4 @@ export const showImageDialog = async (
 		filePath,
 		imageFormat: getImageFormat(filePath),
 	};
-};
-
-export const getVideoRecordSaveDirectory = async (
-	appSettings: AppSettingsData,
-) => {
-	let savePath =
-		appSettings[AppSettingsGroup.FunctionVideoRecord].saveDirectory;
-
-	if (!savePath) {
-		savePath = await joinPath(await videoDir(), "Snow Shot");
-	}
-
-	return savePath;
 };

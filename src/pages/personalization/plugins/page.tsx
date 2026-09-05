@@ -6,10 +6,6 @@ import { Badge, Button, List } from "antd";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pluginInstallPlugin, pluginUninstallPlugin } from "@/commands/plugin";
-import {
-	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
-} from "@/constants/pluginService";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { PluginStatus } from "@/types/commands/plugin";
 import { appError } from "@/utils/log";
@@ -20,15 +16,7 @@ export const PluginsPage = () => {
 
 	const pluginList = useMemo(() => {
 		return Array.from(pluginConfig?.plugins.values() || []).map((plugin) => {
-			let link: string | undefined;
-			switch (plugin.id) {
-				case PLUGIN_ID_FFMPEG:
-					link = "https://ffmpeg.org/";
-					break;
-				case PLUGIN_ID_RAPID_OCR:
-					link = "https://github.com/RapidAI/RapidOCR";
-					break;
-			}
+			const link: string | undefined = undefined;
 
 			return {
 				id: plugin.id,

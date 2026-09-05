@@ -127,10 +127,6 @@ export const drawSelectRect = (
 		MASK_CIRCLE_CONTROL_SHOW_MID_CONTROL_WIDTH * scaleFactor,
 	);
 
-	if (drawState === DrawState.ScanQrcode) {
-		radius = 0;
-	}
-
 	if (drawElementMask) {
 		canvasContext.putImageData(drawElementMask.imageData, 0, 0);
 	}

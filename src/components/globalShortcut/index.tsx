@@ -1,6 +1,5 @@
 import {
 	AppstoreOutlined,
-	FieldTimeOutlined,
 	FolderOutlined,
 	HistoryOutlined,
 } from "@ant-design/icons";
@@ -11,7 +10,6 @@ import {
 	unregister,
 	unregisterAll,
 } from "@tauri-apps/plugin-global-shortcut";
-import { Tooltip } from "antd";
 import React, {
 	createContext,
 	useCallback,
@@ -28,7 +26,6 @@ import {
 import { getCaptureState } from "@/commands/globalSate";
 import { IconLabel } from "@/components/iconLable";
 import {
-	ChatIcon,
 	ClipboardIcon,
 	FixedIcon,
 	FocusedWindowIcon,
@@ -40,16 +37,10 @@ import {
 	SelectTextIcon,
 	TopWindowIcon,
 	TranslationIcon,
-	VideoRecordIcon,
 } from "@/components/icons";
 import { TrayIconStatePublisher } from "@/components/trayIconLoader";
 import { defaultAppFunctionConfigs } from "@/constants/appFunction";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
@@ -57,15 +48,12 @@ import {
 	executeScreenshotFocusedWindow,
 } from "@/functions/screenshot";
 import {
-	executeChat,
-	executeChatSelectedText,
 	executeTranslate,
 	executeTranslateSelectedText,
 	openCaptureHistory,
 	openImageSaveFolder,
 	showOrHideMainWindow,
 } from "@/functions/tools";
-import { startOrCopyVideo } from "@/functions/videoRecord";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
@@ -81,7 +69,6 @@ import {
 } from "@/types/components/appFunction";
 import { appError } from "@/utils/log";
 import { ScreenshotType } from "@/utils/types";
-import { ChangeDelaySeconds } from "./components/changeDelaySeconds";
 
 export type GlobalShortcutContextType = {
 	disableShortcutKeyRef: React.RefObject<boolean>;
@@ -132,30 +119,12 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 	} = useMemo(() => {
 		const configs = Object.keys(defaultAppFunctionConfigs)
 			.filter((key) => {
-				if (
-					key === AppFunction.VideoRecord ||
-					key === AppFunction.VideoRecordCopy
-				) {
-					return isReadyStatus?.(PLUGIN_ID_FFMPEG);
-				}
-
-				if (key === AppFunction.ScreenshotOcr) {
-					return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
-				}
-
-				if (key === AppFunction.Chat) {
-					return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-				}
-
 				if (key === AppFunction.Translation) {
 					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 				}
 
 				if (key === AppFunction.ScreenshotOcrTranslate) {
-					return (
-						isReadyStatus?.(PLUGIN_ID_RAPID_OCR) &&
-						isReadyStatus?.(PLUGIN_ID_TRANSLATE)
-					);
+					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 				}
 
 				return true;
@@ -170,29 +139,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonTitle = <FormattedMessage id="draw.fixedTool" />;
 							buttonIcon = <FixedIcon style={{ fontSize: "1.3em" }} />;
 							buttonOnClick = () => executeScreenshot(ScreenshotType.Fixed);
-							break;
-						case AppFunction.ScreenshotDelay:
-							buttonTitle = (
-								<Tooltip
-									title={
-										<FormattedMessage id="home.screenshotFunction.screenshotDelay.tip" />
-									}
-									key="screenshot-delay"
-								>
-									<div>
-										<FormattedMessage
-											id="home.screenshotFunction.screenshotDelay"
-											values={{
-												seconds: (
-													<ChangeDelaySeconds key="screenshot-delay-seconds" />
-												),
-											}}
-										/>
-									</div>
-								</Tooltip>
-							);
-							buttonIcon = <FieldTimeOutlined />;
-							buttonOnClick = () => executeScreenshot(ScreenshotType.Delay);
 							break;
 						case AppFunction.ScreenshotOcr:
 							buttonTitle = <FormattedMessage id="draw.ocrDetectTool" />;
@@ -226,13 +172,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 								executeScreenshotFocusedWindow(getAppSettings());
 							};
 							break;
-						case AppFunction.ScreenshotCopy:
-							buttonTitle = (
-								<FormattedMessage id="home.screenshotFunction.screenshotCopy" />
-							);
-							buttonIcon = <ClipboardIcon style={{ fontSize: "1.1em" }} />;
-							buttonOnClick = () => executeScreenshot(ScreenshotType.Copy);
-							break;
 						case AppFunction.TranslationSelectText:
 							buttonTitle = (
 								<FormattedMessage id="home.translationSelectText" />
@@ -247,20 +186,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonIcon = <TranslationIcon />;
 							buttonOnClick = () => {
 								executeTranslate();
-							};
-							break;
-						case AppFunction.ChatSelectText:
-							buttonTitle = <FormattedMessage id="home.chatSelectText" />;
-							buttonIcon = <SelectTextIcon style={{ fontSize: "1em" }} />;
-							buttonOnClick = async () => {
-								executeChatSelectedText();
-							};
-							break;
-						case AppFunction.Chat:
-							buttonTitle = <FormattedMessage id="home.chat" />;
-							buttonIcon = <ChatIcon />;
-							buttonOnClick = () => {
-								executeChat();
 							};
 							break;
 						case AppFunction.TopWindow:
@@ -298,23 +223,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonTitle = <FormattedMessage id="home.openCaptureHistory" />;
 							buttonIcon = <HistoryOutlined />;
 							buttonOnClick = () => openCaptureHistory();
-							break;
-						case AppFunction.VideoRecord:
-							buttonTitle = (
-								<FormattedMessage id="home.videoRecordFunction.videoRecord" />
-							);
-							buttonIcon = <VideoRecordIcon style={{ fontSize: "1.1em" }} />;
-							buttonOnClick = () =>
-								executeScreenshot(ScreenshotType.VideoRecord);
-							break;
-						case AppFunction.VideoRecordCopy:
-							buttonTitle = (
-								<FormattedMessage id="home.videoRecordFunction.copyVideo" />
-							);
-							buttonIcon = <ClipboardIcon style={{ fontSize: "1.1em" }} />;
-							buttonOnClick = () => {
-								startOrCopyVideo();
-							};
 							break;
 						case AppFunction.Screenshot:
 							buttonTitle = <FormattedMessage id="home.screenshot" />;

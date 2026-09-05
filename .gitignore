@@ -44,3 +44,6 @@ tsconfig.tsbuildinfo
 
 # env files (can opt-in for committing if needed)
 .env*
+
+# WorkBuddy 私有数据（工具记忆/配置，不入库）
+.workbuddy/

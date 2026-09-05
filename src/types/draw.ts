@@ -56,18 +56,13 @@ export enum DrawState {
 	ScrollScreenshot = 109,
 	// 额外工具
 	ExtraTools = 110,
-	// 扫描二维码
-	ScanQrcode = 111,
 	// 激光笔
 	LaserPointer = 112,
 	// 鼠标穿透
 	MouseThrough = 113,
-	// 视频录制
-	VideoRecord = 114,
 	// 拖拽窗口
 	DragWindow = 115,
 	// 保存到云端
-	SaveToCloud = 116,
 	// 重置画布
 	ResetCanvas = 117,
 }

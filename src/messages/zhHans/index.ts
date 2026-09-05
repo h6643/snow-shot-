@@ -1,4 +1,3 @@
-import { about } from "./about";
 import { appearance } from "./appearance";
 import { common } from "./common";
 import { draw } from "./draw";
@@ -9,8 +8,6 @@ import { personalization } from "./personalization";
 import { plugin } from "./plugin";
 import { settings } from "./settings";
 import { tools } from "./tools";
-import { videoRecord } from "./videoRecord";
-
 export const zhHans = {
 	...menu,
 	...settings,
@@ -19,8 +16,6 @@ export const zhHans = {
 	...tools,
 	...common,
 	...fullScreenDraw,
-	...about,
-	...videoRecord,
 	...plugin,
 	...personalization,
 	...appearance,

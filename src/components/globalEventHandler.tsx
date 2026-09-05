@@ -2,7 +2,6 @@ import { useRouter } from "@tanstack/react-router";
 import { openPath } from "@tauri-apps/plugin-opener";
 import React, { useContext, useEffect } from "react";
 import { getSelectedText } from "@/commands/core";
-import { showMainWindow } from "@/commands/videoRecord";
 import { EventListenerContext } from "@/components/eventListener";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -19,17 +18,6 @@ const GlobalEventHandlerCore: React.FC = () => {
 	useEffect(() => {
 		const listenerIdList: number[] = [];
 		listenerIdList.push(
-			addListener("execute-chat", () => {
-				showWindow();
-				router.navigate({ to: `/tools/chat?t=${Date.now()}` });
-			}),
-			addListener("execute-chat-selected-text", async () => {
-				const text = (await getSelectedText()).substring(0, 10000);
-				await showWindow();
-				router.navigate({
-					to: `/tools/chat?selectText=${encodeParamsValue(text)}&t=${Date.now()}`,
-				});
-			}),
 			addListener("execute-translate", () => {
 				showWindow();
 				router.navigate({ to: `/tools/translation?t=${Date.now()}` });
@@ -42,7 +30,7 @@ const GlobalEventHandlerCore: React.FC = () => {
 				});
 			}),
 			addListener("show-or-hide-main-window", () => {
-				showMainWindow(true);
+				showWindow();
 			}),
 			addListener("open-image-save-folder", async () => {
 				const saveFileDirectory = await getImageSaveDirectory(getAppSettings());

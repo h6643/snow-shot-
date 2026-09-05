@@ -11,6 +11,9 @@
 		"beforeDevCommand": "pnpm dev",
 		"beforeBuildCommand": "pnpm build"
 	},
+	"bundle": {
+		"resources": ["resources/ocr-models/*"]
+	},
 	"app": {
 		"withGlobalTauri": true,
 		"windows": [
@@ -30,7 +33,7 @@
 					"y": 16
 				},
 				"visible": false,
-				"backgroundThrottling": "disabled",
+				"backgroundThrottling": "normal",
 				"url": "/"
 			}
 		],

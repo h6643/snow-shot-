@@ -7,11 +7,7 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
-import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -31,7 +27,6 @@ import { DrawState } from "@/types/draw";
 import { writeTextToClipboard } from "@/utils/clipboard";
 import { ScreenshotType } from "@/utils/types";
 import { zIndexs } from "@/utils/zIndex";
-import { getCanvas } from "../../actions";
 import {
 	type CaptureBoundingBoxInfo,
 	ScreenshotTypePublisher,
@@ -40,7 +35,7 @@ import { DrawContext } from "../../types";
 import OcrTool, { isOcrTool } from "../drawToolbar/components/tools/ocrTool";
 
 export type OcrBlocksSelectedText = {
-	type: "text" | "visionModelHtml";
+	type: "text";
 	text: string;
 };
 
@@ -144,71 +139,8 @@ export const OcrBlocks: React.FC<{
 		ocrResultActionRef.current?.startTranslate();
 	}, []);
 
-	const intl = useIntl();
+	const _intl = useIntl();
 	const { message } = useContext(AntdContext);
-
-	const [visionModelHtmlLoading, setVisionModelHtmlLoading] = useState(false);
-	const [visionModelMarkdownLoading, setVisionModelMarkdownLoading] =
-		useState(false);
-	const onConvertImageToVisionModelFormat = useCallback(
-		async (format: "html" | "markdown") => {
-			if (format === "html") {
-				setVisionModelHtmlLoading(true);
-			} else if (format === "markdown") {
-				setVisionModelMarkdownLoading(true);
-			} else {
-				return;
-			}
-
-			const selectRectParams =
-				selectLayerActionRef.current?.getSelectRectParams();
-			const imageLayerAction = imageLayerActionRef.current;
-			const drawLayerAction = drawLayerActionRef.current;
-			if (!selectRectParams || !imageLayerAction || !drawLayerAction) {
-				return;
-			}
-
-			if (
-				selectRectParams.rect.max_x - selectRectParams.rect.min_x < 10 ||
-				selectRectParams.rect.max_y - selectRectParams.rect.min_y < 10
-			) {
-				message.error(
-					intl.formatMessage({ id: "draw.ocrResult.imageTooSmall" }),
-				);
-				return;
-			}
-
-			const screenshotCanvas = await getCanvas(
-				selectRectParams,
-				imageLayerAction,
-				drawLayerAction,
-				true,
-				true,
-				INIT_CONTAINER_KEY,
-			);
-
-			if (!screenshotCanvas) {
-				return;
-			}
-
-			if (format === "html") {
-				await ocrResultActionRef.current?.convertImageToHtml(screenshotCanvas);
-				setVisionModelHtmlLoading(false);
-			} else if (format === "markdown") {
-				await ocrResultActionRef.current?.convertImageToMarkdown(
-					screenshotCanvas,
-				);
-				setVisionModelMarkdownLoading(false);
-			}
-		},
-		[
-			selectLayerActionRef,
-			imageLayerActionRef,
-			drawLayerActionRef,
-			intl,
-			message,
-		],
-	);
 
 	const [currentOcrResult, setCurrentOcrResult] = useState<
 		(AppOcrResult & { ocrResultType: OcrResultType }) | undefined
@@ -223,39 +155,19 @@ export const OcrBlocks: React.FC<{
 	const onSwitchOcrResult = useCallback((ocrResultType: OcrResultType) => {
 		ocrResultActionRef.current?.switchOcrResult(ocrResultType);
 	}, []);
-	const [visionModelHtmlResult, setVisionModelHtmlResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
-	const [visionModelMarkdownResult, setVisionModelMarkdownResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
-
-	const onConvertImageToHtml = useCallback(() => {
-		onConvertImageToVisionModelFormat("html");
-	}, [onConvertImageToVisionModelFormat]);
-	const onConvertImageToMarkdown = useCallback(() => {
-		onConvertImageToVisionModelFormat("markdown");
-	}, [onConvertImageToVisionModelFormat]);
 
 	const { isReadyStatus } = usePluginServiceContext();
 
 	return (
 		<>
-			{(isReadyStatus?.(PLUGIN_ID_TRANSLATE) ||
-				isReadyStatus?.(PLUGIN_ID_AI_CHAT)) && (
+			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
 				<OcrTool
 					onSwitchOcrResult={onSwitchOcrResult}
 					onTranslate={onTranslate}
-					onConvertImageToHtml={onConvertImageToHtml}
-					onConvertImageToMarkdown={onConvertImageToMarkdown}
 					currentOcrResult={currentOcrResult}
 					ocrResult={ocrResult}
 					translatedOcrResult={translatedOcrResult}
 					translateLoading={translateLoading}
-					visionModelHtmlResult={visionModelHtmlResult}
-					visionModelHtmlLoading={visionModelHtmlLoading}
-					visionModelMarkdownResult={visionModelMarkdownResult}
-					visionModelMarkdownLoading={visionModelMarkdownLoading}
 				/>
 			)}
 
@@ -267,9 +179,6 @@ export const OcrBlocks: React.FC<{
 				onOcrResultChange={setOcrResult}
 				onTranslatedResultChange={setTranslatedOcrResult}
 				onTranslateLoading={setTranslateLoading}
-				onVisionModelHtmlResultChange={setVisionModelHtmlResult}
-				onVisionModelMarkdownResultChange={setVisionModelMarkdownResult}
-				onVisionModelMarkdownLoading={setVisionModelMarkdownLoading}
 			/>
 		</>
 	);

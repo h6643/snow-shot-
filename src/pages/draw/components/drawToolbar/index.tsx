@@ -33,15 +33,11 @@ import {
 	OcrTranslateIcon,
 	PenIcon,
 	SaveIcon,
-	SaveToCloudIcon,
 	ScrollScreenshotIcon,
 	SerialNumberIcon,
 	TextIcon,
 } from "@/components/icons";
-import {
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import {
 	AppSettingsActionContext,
@@ -94,7 +90,6 @@ export type DrawToolbarProps = {
 	actionRef: React.RefObject<DrawToolbarActionType | undefined>;
 	onCancel: () => void;
 	onSave: (fastSave?: boolean) => void;
-	onSaveToCloud: () => void;
 	onFixed: () => void;
 	onTopWindow: () => void;
 	onCopyToClipboard: () => void;
@@ -136,7 +131,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 	actionRef,
 	onCancel,
 	onSave,
-	onSaveToCloud,
 	onFixed,
 	onCopyToClipboard,
 	onTopWindow,
@@ -155,7 +149,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 	const [enableLockDrawTool, setEnableLockDrawTool, enableLockDrawToolRef] =
 		useStateRef(false);
 	const [enableFastSave, setEnableFastSave] = useState(false);
-	const [enableSaveToCloud, setEnableSaveToCloud] = useState(false);
 	const [enableScrollScreenshot, setEnableScrollScreenshot] = useState(false);
 	const [shortcutCanleTip, setShortcutCanleTip] = useState(false);
 	const [customToolbarToolHiddenMap, setCustomToolbarToolHiddenMap] = useState<
@@ -201,9 +194,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 				);
 				setEnableFastSave(
 					settings[AppSettingsGroup.FunctionScreenshot].fastSave,
-				);
-				setEnableSaveToCloud(
-					settings[AppSettingsGroup.FunctionScreenshot].saveToCloud,
 				);
 				// 不显示锁定绘制工具
 				setShowLockDrawTool(
@@ -481,12 +471,8 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 					break;
 				case DrawState.OcrDetect:
 				case DrawState.OcrTranslate:
-					if (isReady?.(PLUGIN_ID_RAPID_OCR)) {
-						onOcrDetect();
-					}
+					onOcrDetect();
 					break;
-				case DrawState.VideoRecord:
-				case DrawState.ScanQrcode:
 				case DrawState.ExtraTools:
 					break;
 				default:
@@ -506,7 +492,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 			enableLockDrawToolRef,
 			getDrawState,
 			intl,
-			isReady,
 			message,
 			onOcrDetect,
 			selectLayerActionRef,
@@ -628,9 +613,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 						break;
 					case ScreenshotType.Copy:
 						onCopyToClipboard();
-						break;
-					case ScreenshotType.VideoRecord:
-						onToolClick(DrawState.VideoRecord);
 						break;
 					case ScreenshotType.TopWindow:
 						onTopWindow();
@@ -920,17 +902,11 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 
 							{/* OCR */}
 							<ToolButton
-								hidden={
-									customToolbarToolHiddenMap?.[DrawState.OcrDetect] ||
-									!isReadyStatus?.(PLUGIN_ID_RAPID_OCR)
-								}
+								hidden={customToolbarToolHiddenMap?.[DrawState.OcrDetect]}
 								componentKey={DrawToolbarKeyEventKey.OcrDetectTool}
 								icon={<OcrDetectIcon style={{ fontSize: "0.88em" }} />}
 								drawState={DrawState.OcrDetect}
-								disable={
-									disableNormalScreenshotTool ||
-									!isReadyStatus?.(PLUGIN_ID_RAPID_OCR)
-								}
+								disable={disableNormalScreenshotTool}
 								onClick={() => {
 									onToolClick(DrawState.OcrDetect);
 								}}
@@ -940,20 +916,14 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 							<ToolButton
 								hidden={
 									customToolbarToolHiddenMap?.[DrawState.OcrTranslate] ||
-									!(
-										isReadyStatus?.(PLUGIN_ID_RAPID_OCR) &&
-										isReadyStatus?.(PLUGIN_ID_TRANSLATE)
-									)
+									!isReadyStatus?.(PLUGIN_ID_TRANSLATE)
 								}
 								componentKey={DrawToolbarKeyEventKey.OcrTranslateTool}
 								icon={<OcrTranslateIcon style={{ fontSize: "1em" }} />}
 								drawState={DrawState.OcrTranslate}
 								disable={
 									disableNormalScreenshotTool ||
-									!(
-										isReadyStatus?.(PLUGIN_ID_RAPID_OCR) &&
-										isReadyStatus?.(PLUGIN_ID_TRANSLATE)
-									)
+									!isReadyStatus?.(PLUGIN_ID_TRANSLATE)
 								}
 								onClick={() => {
 									onToolClick(DrawState.OcrTranslate);
@@ -986,19 +956,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 									drawState={DrawState.FastSave}
 									onClick={() => {
 										onSave(true);
-									}}
-								/>
-							)}
-
-							{/* 保存到云端 */}
-							{enableSaveToCloud && (
-								<ToolButton
-									hidden={customToolbarToolHiddenMap?.[DrawState.SaveToCloud]}
-									componentKey={DrawToolbarKeyEventKey.SaveToCloudTool}
-									icon={<SaveToCloudIcon style={{ fontSize: "1.08em" }} />}
-									drawState={DrawState.SaveToCloud}
-									onClick={() => {
-										onSaveToCloud();
 									}}
 								/>
 							)}

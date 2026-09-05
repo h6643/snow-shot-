@@ -8,44 +8,6 @@ export const settings = {
 	"settings.theme.dark": "暗黑",
 	"settings.theme.system": "跟随系统",
 	"settings.theme.mainColor": "主色",
-	"settings.themeSkinSettings": "主题皮肤",
-	"settings.themeSkinSettings.skinPath": "皮肤路径",
-	"settings.themeSkinSettings.skinOpacity": "皮肤透明度",
-	"settings.themeSkinSettings.skinPosition": "皮肤位置",
-	"settings.themeSkinSettings.skinPosition.top": "顶部",
-	"settings.themeSkinSettings.skinPosition.bottom": "底部",
-	"settings.themeSkinSettings.skinPosition.left": "左侧",
-	"settings.themeSkinSettings.skinPosition.right": "右侧",
-	"settings.themeSkinSettings.skinPosition.center": "居中",
-	"settings.themeSkinSettings.skinPosition.top-left": "左上角",
-	"settings.themeSkinSettings.skinPosition.top-right": "右上角",
-	"settings.themeSkinSettings.skinPosition.bottom-left": "左下角",
-	"settings.themeSkinSettings.skinPosition.bottom-right": "右下角",
-	"settings.themeSkinSettings.skinBlur": "皮肤模糊度",
-	"settings.themeSkinSettings.skinMaskOpacity": "皮肤遮罩透明度",
-	"settings.themeSkinSettings.skinMaskBlur": "皮肤遮罩模糊度",
-	"settings.themeSkinSettings.skinImageSize": "皮肤显示方式",
-	"settings.themeSkinSettings.customCss": "自定义 CSS",
-	"settings.themeSkinSettings.skinImageSize.cover": "覆盖",
-	"settings.themeSkinSettings.skinImageSize.contain": "包含",
-	"settings.themeSkinSettings.skinImageSize.fill": "填充",
-	"settings.themeSkinSettings.skinMixBlendMode": "皮肤混合模式",
-	"settings.themeSkinSettings.skinMixBlendMode.unset": "无",
-	"settings.themeSkinSettings.skinMixBlendMode.multiply": "正片叠底",
-	"settings.themeSkinSettings.skinMixBlendMode.screen": "屏幕",
-	"settings.themeSkinSettings.skinMixBlendMode.overlay": "叠加",
-	"settings.themeSkinSettings.skinMixBlendMode.darken": "变暗",
-	"settings.themeSkinSettings.skinMixBlendMode.lighten": "变亮",
-	"settings.themeSkinSettings.skinMixBlendMode.color-dodge": "颜色减淡",
-	"settings.themeSkinSettings.skinMixBlendMode.color-burn": "颜色加深",
-	"settings.themeSkinSettings.skinMixBlendMode.hard-light": "强光",
-	"settings.themeSkinSettings.skinMixBlendMode.soft-light": "柔光",
-	"settings.themeSkinSettings.skinMixBlendMode.difference": "差值",
-	"settings.themeSkinSettings.skinMixBlendMode.exclusion": "排除",
-	"settings.themeSkinSettings.skinMixBlendMode.hue": "色相",
-	"settings.themeSkinSettings.skinMixBlendMode.saturation": "饱和度",
-	"settings.themeSkinSettings.skinMixBlendMode.color": "颜色",
-	"settings.themeSkinSettings.skinMixBlendMode.luminosity": "亮度",
 	"settings.controlNode": "选区控件样式",
 	"settings.commonSettings.screenshotSettings.uiScale": "界面缩放比例",
 	"settings.commonSettings.screenshotSettings.toolbarUiScale": "工具栏缩放比例",
@@ -113,20 +75,8 @@ export const settings = {
 	"settings.systemSettings.commonSettings.runLog.tip":
 		"将日志输出到日志文件中，用于问题反馈",
 	"settings.hotKeySettings.translation": "翻译",
-	"settings.hotKeySettings.chat": "AI 对话",
 	"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
-	"settings.chatSettings": "AI 对话",
-	"settings.chatSettings.maxTokens": "最大 Token 数",
-	"settings.chatSettings.maxTokens.tip":
-		"限制一次请求中模型生成 completion 的最大 token 数",
-	"settings.chatSettings.temperature": "Temperature",
-	"settings.chatSettings.temperature.tip":
-		"更高的值，如 0.8，会使输出更随机，而更低的值，如 0.2，会使其更加集中和确定",
 	"settings.systemSettings.networkSettings": "网络",
-	"settings.systemSettings.networkSettings.proxy": "系统代理",
-	"settings.chatSettings.thinkingBudgetTokens": "思考预算 Token 数",
-	"settings.chatSettings.thinkingBudgetTokens.tip":
-		'对于如 Claude 模型的推理模式，思考预算决定其内部推理过程的最大 Token 数。注意，思考预算 Token 数不能小于"最大 Token 数"，所以如果该值有效，"最大 Token 数"可能由服务器决定',
 	"settings.functionSettings.drawSettings": "绘制",
 	"settings.functionSettings.drawSettings.disableQuickSelectElementToolList":
 		"禁用选择相同类型的元素",
@@ -146,41 +96,6 @@ export const settings = {
 		"目标语言",
 	"settings.functionSettings.translationSettings.chatPrompt.translationDomain":
 		"翻译领域",
-	"settings.functionSettings.chatSettings": "AI 对话",
-	"settings.functionSettings.chatSettings.autoCreateNewSession":
-		"快捷键启动时自动创建新会话",
-	"settings.functionSettings.chatSettings.autoCreateNewSessionOnCloseWindow":
-		"关闭窗口时自动创建新会话",
-	"settings.functionSettings.chatSettings.apiConfig": "API 配置",
-	"settings.functionSettings.chatSettings.apiConfig.tip":
-		"仅支持兼容 OpenAI SDK 的 API 配置，新增配置后将自动支持 AI 翻译",
-	"settings.functionSettings.chatSettings.apiConfig.add": "添加 API 配置",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey": "API Key",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey.tip":
-		"注意该配置在本地明文保存（也不会上传到云端）",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey.required":
-		"请输入 API Key",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri": "API 地址",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri.required":
-		"请输入 API 地址",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri.tip":
-		"格式如：https://api.openai.com/v1",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel": "API 模型",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel.tip":
-		"API 模型，如：gpt-3.5-turbo",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel.required":
-		"请输入 API 模型",
-	"settings.functionSettings.chatSettings.apiConfig.modelName": "模型名称",
-	"settings.functionSettings.chatSettings.apiConfig.modelName.tip":
-		"模型名称用于 Snow Shot 的展示",
-	"settings.functionSettings.chatSettings.apiConfig.modelName.required":
-		"请输入模型名称",
-	"settings.functionSettings.chatSettings.apiConfig.supportThinking":
-		"支持推理",
-	"settings.functionSettings.chatSettings.apiConfig.supportVision":
-		"支持视觉理解",
-	"settings.functionSettings.chatSettings.apiConfig.supportVision.tip":
-		"启用后，该模型将可用于视觉理解，将图片转化为 HTML 等格式的内容",
 	"settings.functionSettings.screenshotSettings": "截图",
 	"settings.functionSettings.screenshotSettings.findChildrenElements":
 		"查找窗口子元素",
@@ -222,30 +137,6 @@ export const settings = {
 		"截取当前具有焦点的窗口时复制到剪贴板",
 	"settings.functionSettings.screenshotSettings.fullScreenCopyToClipboard":
 		"截取全屏时复制到剪贴板",
-	"settings.functionSettings.screenshotSettings.saveToCloud": "保存到云端",
-	"settings.functionSettings.screenshotSettings.saveToCloud.tip":
-		"工具栏新增保存到云端按钮，快速保存到云端并复制结果到剪贴板",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.type":
-		"云端保存协议",
-	"settings.functionSettings.screenshotSettings.cloudProxyUrl":
-		"云端资源代理地址",
-	"settings.functionSettings.screenshotSettings.cloudProxyUrl.tip":
-		"填写后，将使用该地址替换实际云端资源链接中的地址",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.type.s3": "S3",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3AccessKeyId":
-		"Access key ID",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3SecretAccessKey":
-		"Secret access key",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3Region":
-		"Region",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3BucketName":
-		"Bucket name",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3Endpoint":
-		"Endpoint",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3PathPrefix":
-		"Path prefix",
-	"settings.functionSettings.screenshotSettings.cloudSaveUrl.s3ForcePathStyle":
-		"Force path style",
 	"settings.functionSettings.screenshotSettings.autoSaveFileMode":
 		"保存文件增强",
 	"settings.functionSettings.screenshotSettings.autoSaveFileMode.saveMode":
@@ -284,78 +175,15 @@ export const settings = {
 		"截取全屏文件名格式",
 	"settings.functionSettings.outputSettings.focusedWindowFileNameFormatPreview":
 		"截取当前具有焦点的窗口文件名预览",
-	"settings.functionSettings.outputSettings.uploadToCloudSaveUrlFormat":
-		"上传到云端文件名格式",
-	"settings.functionSettings.outputSettings.uploadToCloudSaveUrlFormatPreview":
-		"上传到云端文件名预览",
 	"settings.functionSettings.outputSettings.fullScreenFileNameFormatPreview":
 		"截取全屏文件名预览",
-	"settings.functionSettings.outputSettings.videoRecordFileNameFormat":
-		"视频录制文件名格式",
-	"settings.functionSettings.outputSettings.videoRecordFileNameFormatPreview":
-		"视频录制文件名预览",
+
 	"settings.functionSettings.fullScreenDrawSettings": "全屏画布",
 	"settings.functionSettings.fullScreenDrawSettings.defaultTool": "默认工具",
 	"settings.functionSettings.fullScreenDrawSettings.defaultTool.select": "选择",
 	"settings.functionSettings.fullScreenDrawSettings.defaultTool.laserPointer":
 		"激光笔",
-	"settings.functionSettings.videoRecordSettings": "视频录制",
-	"settings.functionSettings.videoRecordSettings.frameRate": "帧率",
-	"settings.functionSettings.videoRecordSettings.enableExcludeFromCapture":
-		"录制画面中隐藏工具栏",
-	"settings.functionSettings.videoRecordSettings.gifFrameRate": "动图帧率",
-	"settings.functionSettings.videoRecordSettings.enableApngFormat":
-		"启用 APNG 格式",
-	"settings.functionSettings.videoRecordSettings.gifFormat": "动图格式",
-	"settings.functionSettings.videoRecordSettings.gifFormat.gif": "GIF",
-	"settings.functionSettings.videoRecordSettings.gifFormat.apng": "APNG",
-	"settings.functionSettings.videoRecordSettings.gifFormat.webp": "WebP",
-	"settings.functionSettings.videoRecordSettings.microphoneDeviceName":
-		"麦克风设备",
-	"settings.functionSettings.videoRecordSettings.microphoneDeviceName.default":
-		"默认设备",
-	"settings.functionSettings.videoRecordSettings.encoder": "编码器",
-	"settings.functionSettings.videoRecordSettings.encoder.tip":
-		"启用硬件编码时请注意适用平台，错误的编码器将无法进行录制",
-	"settings.functionSettings.videoRecordSettings.encoderPreset": "编码速率",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.ultrafast":
-		"最高速度",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.veryfast":
-		"非常快",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.medium": "中等",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.slower": "慢速",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.placebo": "无损",
-	"settings.functionSettings.videoRecordSettings.encoderPreset.tip":
-		"编码速率越快，计算资源消耗越低，但视频文件越大",
-	"settings.functionSettings.videoRecordSettings.hwaccel": "启用硬件加速",
-	"settings.functionSettings.videoRecordSettings.saveDirectory": "保存目录",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize": "视频清晰度",
-	"settings.functionSettings.videoRecordSettings.gifMaxSize": "动图清晰度",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.tip":
-		"视频录制时，视频的最大尺寸，如果超出该尺寸，将进行等比例缩放",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.p2160": "4K",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.p1440": "2K",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.p1080": "1080P",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.p720": "720P",
-	"settings.functionSettings.videoRecordSettings.videoMaxSize.p480": "480P",
-	"settings.functionSettings.videoRecordSettings.keyDisplaySettings":
-		"按键显示",
-	"settings.functionSettings.videoRecordSettings.keyDisplayFontSize":
-		"字体大小",
-	"settings.functionSettings.videoRecordSettings.keyDisplayBackgroundColor":
-		"背景颜色",
-	"settings.functionSettings.videoRecordSettings.keyDisplayTextColor":
-		"文字颜色",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDuration":
-		"显示时长",
-	"settings.functionSettings.videoRecordSettings.keyDisplayMergeDuration":
-		"合并时间",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection":
-		"显示方向",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.horizontal":
-		"横向",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.vertical":
-		"竖向",
+
 	"settings.systemSettings.scrollScreenshotSettings": "滚动截图",
 	"settings.systemSettings.scrollScreenshotSettings.tryRollback":
 		"匹配两侧图片",
@@ -382,20 +210,6 @@ export const settings = {
 	"settings.commonSettings.trayIconSettings.enableTrayIcon": "启用托盘",
 	"settings.commonSettings.trayIconSettings.enableTrayIconTip":
 		"关闭后，请通过固定到屏幕窗口的右键菜单打开主界面",
-	"settings.commonSettings.trayIconSettings.defaultIcons": "默认图标",
-	"settings.commonSettings.trayIconSettings.defaultIcons.darkDefault":
-		"默认图标（暗黑）",
-	"settings.commonSettings.trayIconSettings.defaultIcons.default": "默认",
-	"settings.commonSettings.trayIconSettings.defaultIcons.light": "浅色",
-	"settings.commonSettings.trayIconSettings.defaultIcons.dark": "暗色",
-	"settings.commonSettings.trayIconSettings.defaultIcons.snowDefault": "雪花",
-	"settings.commonSettings.trayIconSettings.defaultIcons.snowLight": "雪花浅色",
-	"settings.commonSettings.trayIconSettings.defaultIcons.snowDark": "雪花暗色",
-	"settings.commonSettings.trayIconSettings.iconPath": "自定义图标路径",
-	"settings.commonSettings.trayIconSettings.iconPath.darkDefault":
-		"自定义图标路径（暗黑）",
-	"settings.commonSettings.trayIconSettings.iconPath.tip":
-		"建议 32x32 或 64x64 的图标",
 	"settings.hotKeySettings.fixedContent": "固定到屏幕",
 	"settings.hotKeySettings.fixedContent.fixedContentEnableDraw": "绘制模式",
 	"settings.hotKeySettings.fixedContent.fixedContentSwitchThumbnail":
@@ -490,9 +304,6 @@ export const settings = {
 	"settings.systemSettings.appLogFilePath.open": "打开目录",
 	"settings.systemSettings.appLogFilePath.open.failed":
 		"打开日志目录失败，请手动复制目录打开",
-	"settings.functionSettings.chatSettings.testChat": "测试 API 配置",
-	"settings.functionSettings.chatSettings.testPrompt":
-		'测试提示词: "Say "Hello, world!""',
 	"settings.systemSettings.screenshotSettings": "截图",
 	"settings.systemSettings.screenshotSettings.tryGetElementByFocus":
 		"选取窗口元素增强",
@@ -588,16 +399,6 @@ export const settings = {
 	"settings.systemSettings.coreSettings.hotLoadPageCount.tip":
 		"通过热加载页面，实现固定剪贴板内容到屏幕、视频录制、全屏画布等功能的快速加载，但同时提高了内存的占用",
 	"settings.functionSettings.ocrSettings": "文本识别",
-	"settings.functionSettings.ocrSettings.htmlVisionModel": "视觉理解模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.tip":
-		"将图片转为 HTML 的视觉理解模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.default": "默认",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.default.tip":
-		"默认使用首个支持视觉理解的模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModelSystemPrompt":
-		"图片转为 HTML 的 System 提示词",
-	"settings.functionSettings.ocrSettings.markdownVisionModelSystemPrompt":
-		"图片转为 Markdown 的 System 提示词",
 	"settings.functionSettings.globalShortcutSettings": "全局快捷键",
 	"settings.functionSettings.globalShortcutSettings.disableOnFocusedFullScreenWindow":
 		"存在被聚焦的全屏窗口时自动禁用",

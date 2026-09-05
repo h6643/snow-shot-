@@ -14,6 +14,7 @@ export const GroupTitle: React.FC<{
 				marginBottom: token.margin,
 				display: "flex",
 				justifyContent: "space-between",
+				paddingLeft: token.marginLG / 2,
 			}}
 			level={4}
 			id={id}

@@ -1,8 +1,5 @@
 import { defaultWindowIcon } from "@tauri-apps/api/app";
-import { convertFileSrc } from "@tauri-apps/api/core";
-import { Image } from "@tauri-apps/api/image";
 import { Menu, type MenuItem } from "@tauri-apps/api/menu";
-import { join, resourceDir } from "@tauri-apps/api/path";
 import { TrayIcon, type TrayIconOptions } from "@tauri-apps/api/tray";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { isEqual } from "es-toolkit";
@@ -13,14 +10,8 @@ import {
 	createFixedContentWindow,
 	createFullScreenDrawWindow,
 } from "@/commands/core";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
-import { AppContext } from "@/contexts/appContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
@@ -28,14 +19,11 @@ import {
 	executeScreenshotFocusedWindow,
 } from "@/functions/screenshot";
 import {
-	executeChat,
-	executeChatSelectedText,
 	executeTranslate,
 	executeTranslateSelectedText,
 	openCaptureHistory,
 	openImageSaveFolder,
 } from "@/functions/tools";
-import { startOrCopyVideo } from "@/functions/videoRecord";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { createPublisher } from "@/hooks/useStatePublisher";
 import { useStateRef } from "@/hooks/useStateRef";
@@ -43,9 +31,7 @@ import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
 	type AppSettingsData,
 	AppSettingsGroup,
-	AppSettingsTheme,
 	TrayIconClickAction,
-	TrayIconDefaultIcon,
 } from "@/types/appSettings";
 import {
 	AppFunction,
@@ -63,28 +49,6 @@ export const TrayIconStatePublisher = createPublisher<{
 	disableShortcut: false,
 });
 
-export const getDefaultIconPath = async (
-	defaultIcon: TrayIconDefaultIcon,
-	resourceDirPath?: string,
-): Promise<{
-	web_path: string;
-	native_path: string;
-}> => {
-	const basePath = resourceDirPath ?? (await resourceDir());
-
-	const nativePath = await join(
-		basePath,
-		"app-icons",
-		`snow-shot-tray-${defaultIcon}.png`,
-	);
-	const defaultIconPath = convertFileSrc(nativePath);
-
-	return {
-		web_path: defaultIconPath,
-		native_path: nativePath,
-	};
-};
-
 const TrayIconLoaderComponent = () => {
 	const intl = useIntl();
 	const { message } = useContext(AntdContext);
@@ -96,20 +60,9 @@ const TrayIconLoaderComponent = () => {
 		}, []),
 	);
 
-	const { currentTheme } = useContext(AppContext);
-
-	const [delayScreenshotSeconds, setDelayScreenshotSeconds] = useState(0);
 	const [shortcutKeys, setShortcutKeys, shortcutKeysRef] = useStateRef<
 		Record<AppFunction, AppFunctionConfig> | undefined
 	>(undefined);
-	const [iconPath, setIconPath] = useState("");
-	const [iconPathDark, setIconPathDark] = useState("");
-	const [defaultIcon, setDefaultIcon] = useState<TrayIconDefaultIcon>(
-		TrayIconDefaultIcon.Default,
-	);
-	const [defaultIconDark, setDefaultIconDark] = useState<TrayIconDefaultIcon>(
-		TrayIconDefaultIcon.Default,
-	);
 	const [enableTrayIcon, setEnableTrayIcon] = useState(false);
 	const [getAppSettings] = useStateSubscriber(AppSettingsPublisher, undefined);
 	useAppSettingsLoad(
@@ -125,17 +78,8 @@ const TrayIconLoaderComponent = () => {
 					setShortcutKeys(settings[AppSettingsGroup.AppFunction]);
 				}
 
-				setIconPath(settings[AppSettingsGroup.CommonTrayIcon].iconPath);
-				setIconPathDark(settings[AppSettingsGroup.CommonTrayIcon].iconPathDark);
-				setDefaultIcon(settings[AppSettingsGroup.CommonTrayIcon].defaultIcons);
-				setDefaultIconDark(
-					settings[AppSettingsGroup.CommonTrayIcon].defaultIconsDark,
-				);
 				setEnableTrayIcon(
 					settings[AppSettingsGroup.CommonTrayIcon].enableTrayIcon,
-				);
-				setDelayScreenshotSeconds(
-					settings[AppSettingsGroup.Cache].delayScreenshotSeconds,
 				);
 			},
 			[setShortcutKeys, shortcutKeysRef],
@@ -165,29 +109,6 @@ const TrayIconLoaderComponent = () => {
 
 		const appWindow = getCurrentWindow();
 
-		let iconImage: Image | undefined;
-		try {
-			let targetIconPath = iconPath;
-			if (currentTheme === AppSettingsTheme.Dark && iconPathDark) {
-				targetIconPath = iconPathDark;
-			}
-
-			if (targetIconPath) {
-				iconImage = await Image.fromPath(targetIconPath);
-			}
-		} catch {
-			message.error(intl.formatMessage({ id: "home.trayIcon.error4" }));
-			return;
-		}
-
-		if (iconImage) {
-			const size = await iconImage.size();
-			if (size.width > 128 || size.height > 128) {
-				message.error(intl.formatMessage({ id: "home.trayIcon.error3" }));
-				return;
-			}
-		}
-
 		const menu = await Menu.new({
 			id: `${appWindow.label}-trayIconMenu`,
 			items: [
@@ -202,30 +123,6 @@ const TrayIconLoaderComponent = () => {
 					},
 				},
 				{
-					id: `${appWindow.label}-screenshot-delay`,
-					text: intl.formatMessage(
-						{
-							id: "home.screenshotFunction.screenshotDelay",
-						},
-						{
-							seconds: intl.formatMessage(
-								{
-									id: "home.screenshotFunction.screenshotDelay.seconds",
-								},
-								{
-									seconds: delayScreenshotSeconds,
-								},
-							),
-						},
-					),
-					accelerator: disableShortcut
-						? undefined
-						: formatKey(shortcutKeys[AppFunction.ScreenshotDelay].shortcutKey),
-					action: async () => {
-						executeScreenshot(ScreenshotType.Delay);
-					},
-				},
-				{
 					id: `${appWindow.label}-screenshot-fixedTool`,
 					text: intl.formatMessage({ id: "draw.fixedTool" }),
 					accelerator: disableShortcut
@@ -235,45 +132,26 @@ const TrayIconLoaderComponent = () => {
 						executeScreenshot(ScreenshotType.Fixed);
 					},
 				},
-				...(isReadyStatus(PLUGIN_ID_RAPID_OCR)
-					? [
-							{
-								id: `${appWindow.label}-screenshot-ocr`,
-								text: intl.formatMessage({ id: "draw.ocrDetectTool" }),
-								accelerator: disableShortcut
-									? undefined
-									: formatKey(
-											shortcutKeys[AppFunction.ScreenshotOcr].shortcutKey,
-										),
-								action: async () => {
-									executeScreenshot(ScreenshotType.OcrDetect);
-								},
-							},
-							{
-								id: `${appWindow.label}-screenshot-ocr-translate`,
-								text: intl.formatMessage({ id: "draw.ocrTranslateTool" }),
-								accelerator: disableShortcut
-									? undefined
-									: formatKey(
-											shortcutKeys[AppFunction.ScreenshotOcrTranslate]
-												.shortcutKey,
-										),
-								action: async () => {
-									executeScreenshot(ScreenshotType.OcrTranslate);
-								},
-							},
-						]
-					: []),
 				{
-					id: `${appWindow.label}-screenshot-copy`,
-					text: intl.formatMessage({
-						id: "home.screenshotFunction.screenshotCopy",
-					}),
+					id: `${appWindow.label}-screenshot-ocr`,
+					text: intl.formatMessage({ id: "draw.ocrDetectTool" }),
 					accelerator: disableShortcut
 						? undefined
-						: formatKey(shortcutKeys[AppFunction.ScreenshotCopy].shortcutKey),
+						: formatKey(shortcutKeys[AppFunction.ScreenshotOcr].shortcutKey),
 					action: async () => {
-						executeScreenshot(ScreenshotType.Copy);
+						executeScreenshot(ScreenshotType.OcrDetect);
+					},
+				},
+				{
+					id: `${appWindow.label}-screenshot-ocr-translate`,
+					text: intl.formatMessage({ id: "draw.ocrTranslateTool" }),
+					accelerator: disableShortcut
+						? undefined
+						: formatKey(
+								shortcutKeys[AppFunction.ScreenshotOcrTranslate].shortcutKey,
+							),
+					action: async () => {
+						executeScreenshot(ScreenshotType.OcrTranslate);
 					},
 				},
 				...(shortcutKeys[AppFunction.ScreenshotFocusedWindow].shortcutKey
@@ -309,40 +187,6 @@ const TrayIconLoaderComponent = () => {
 						executeScreenshot(ScreenshotType.CaptureFullScreen);
 					},
 				},
-				...(isReadyStatus(PLUGIN_ID_AI_CHAT)
-					? [
-							{
-								item: "Separator",
-							} as unknown as MenuItem,
-							{
-								id: `${appWindow.label}-chat`,
-								text: intl.formatMessage({ id: "home.chat" }),
-								accelerator: disableShortcut
-									? undefined
-									: formatKey(shortcutKeys[AppFunction.Chat].shortcutKey),
-								action: async () => {
-									executeChat();
-								},
-							},
-							...(shortcutKeys[AppFunction.ChatSelectText].shortcutKey
-								? [
-										{
-											id: `${appWindow.label}-chat-selectText`,
-											text: intl.formatMessage({ id: "home.chatSelectText" }),
-											accelerator: disableShortcut
-												? undefined
-												: formatKey(
-														shortcutKeys[AppFunction.ChatSelectText]
-															.shortcutKey,
-													),
-											action: async () => {
-												executeChatSelectedText();
-											},
-										},
-									]
-								: []),
-						]
-					: []),
 				...(isReadyStatus(PLUGIN_ID_TRANSLATE)
 					? [
 							{
@@ -379,40 +223,6 @@ const TrayIconLoaderComponent = () => {
 										},
 									]
 								: []),
-						]
-					: []),
-				...(isReadyStatus(PLUGIN_ID_FFMPEG)
-					? [
-							{
-								item: "Separator",
-							} as unknown as MenuItem,
-						]
-					: []),
-				...(isReadyStatus(PLUGIN_ID_FFMPEG)
-					? [
-							{
-								id: `${appWindow.label}-screenshot-videoRecord`,
-								text: intl.formatMessage({
-									id: "draw.extraTool.videoRecord",
-								}),
-								accelerator: disableShortcut
-									? undefined
-									: formatKey(
-											shortcutKeys[AppFunction.VideoRecord].shortcutKey,
-										),
-								action: async () => {
-									executeScreenshot(ScreenshotType.VideoRecord);
-								},
-							},
-							{
-								id: `${appWindow.label}-screenshot-videoRecord-copy`,
-								text: intl.formatMessage({
-									id: "home.videoRecordFunction.copyVideo",
-								}),
-								action: async () => {
-									startOrCopyVideo();
-								},
-							},
 						]
 					: []),
 				{
@@ -501,22 +311,7 @@ const TrayIconLoaderComponent = () => {
 		});
 
 		const options: TrayIconOptions = {
-			icon: iconImage
-				? iconImage
-				: ((await (async () => {
-						let targetDefaultIcon = defaultIcon;
-						if (currentTheme === AppSettingsTheme.Dark && defaultIconDark) {
-							targetDefaultIcon = defaultIconDark;
-						}
-
-						const { native_path } = await getDefaultIconPath(targetDefaultIcon);
-
-						const iconImage = await Image.fromPath(native_path);
-
-						return iconImage;
-					})()) ??
-					(await defaultWindowIcon()) ??
-					""),
+			icon: (await defaultWindowIcon()) ?? "",
 			showMenuOnLeftClick: false,
 			tooltip: "Snow Shot",
 			action: (event) => {
@@ -550,16 +345,9 @@ const TrayIconLoaderComponent = () => {
 		enableTrayIcon,
 		intl,
 		disableShortcut,
-		delayScreenshotSeconds,
-		iconPath,
-		message,
-		defaultIcon,
 		getAppSettings,
 		setTrayIconState,
 		isReadyStatus,
-		currentTheme,
-		defaultIconDark,
-		iconPathDark,
 	]);
 
 	useEffect(() => {

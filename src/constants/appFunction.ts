@@ -10,10 +10,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			shortcutKey: "F1",
 			group: AppFunctionGroup.Screenshot,
 		},
-		[AppFunction.ScreenshotDelay]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Screenshot,
-		},
 		[AppFunction.ScreenshotFixed]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
@@ -26,10 +22,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
 		},
-		[AppFunction.ScreenshotCopy]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Screenshot,
-		},
 		[AppFunction.ScreenshotFullScreen]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
@@ -38,14 +30,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			shortcutKey: "",
 			group: AppFunctionGroup.Screenshot,
 		},
-		[AppFunction.ChatSelectText]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Chat,
-		},
-		[AppFunction.Chat]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Chat,
-		},
 		[AppFunction.TranslationSelectText]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Translation,
@@ -53,14 +37,6 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 		[AppFunction.Translation]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Translation,
-		},
-		[AppFunction.VideoRecord]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.VideoRecord,
-		},
-		[AppFunction.VideoRecordCopy]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.VideoRecord,
 		},
 		[AppFunction.FixedContent]: {
 			shortcutKey: "",

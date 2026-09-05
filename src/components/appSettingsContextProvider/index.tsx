@@ -22,7 +22,6 @@ import { defaultAppFunctionConfigs } from "@/constants/appFunction";
 import { defaultAppSettingsData } from "@/constants/appSettings";
 import { defaultCommonKeyEventSettings } from "@/constants/commonKeyEvent";
 import { defaultDrawToolbarKeyEventSettings } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import {
 	AppSettingsActionContext,
@@ -41,24 +40,20 @@ import {
 	AppSettingsGroup,
 	AppSettingsLanguage,
 	AppSettingsTheme,
-	type CloudSaveUrlFormat,
-	CloudSaveUrlType,
 	type DoubleClickAction,
 	ExtraToolList,
 	type HdrColorAlgorithm,
 	type HistoryValidDuration,
 	OcrDetectAfterAction,
 	type TrayIconClickAction,
-	type TrayIconDefaultIcon,
-	type VideoMaxSize,
 } from "@/types/appSettings";
 import type {
 	AppFunction,
 	AppFunctionConfig,
 } from "@/types/components/appFunction";
-import {
+import type {
 	DrawToolbarKeyEventKey,
-	type DrawToolbarKeyEventValue,
+	DrawToolbarKeyEventValue,
 } from "@/types/components/drawToolbar";
 import type {
 	CommonKeyEventKey,
@@ -251,57 +246,6 @@ const AppSettingsContextProviderCore: React.FC<{
 				window.__APP_ACCEPT_LANGUAGE__ = settings.language.startsWith("en")
 					? "en-US"
 					: "zh-CN";
-			} else if (group === AppSettingsGroup.ThemeSkin) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-				settings = {
-					skinPath:
-						typeof newSettings?.skinPath === "string"
-							? newSettings.skinPath
-							: (prevSettings?.skinPath ??
-								defaultAppSettingsData[group].skinPath),
-					skinOpacity:
-						typeof newSettings?.skinOpacity === "number"
-							? Math.min(Math.max(newSettings.skinOpacity, 0), 100)
-							: (prevSettings?.skinOpacity ??
-								defaultAppSettingsData[group].skinOpacity),
-					skinPosition:
-						typeof newSettings?.skinPosition === "string"
-							? newSettings.skinPosition
-							: (prevSettings?.skinPosition ??
-								defaultAppSettingsData[group].skinPosition),
-					skinBlur:
-						typeof newSettings?.skinBlur === "number"
-							? Math.min(Math.max(newSettings.skinBlur, 0), 32)
-							: (prevSettings?.skinBlur ??
-								defaultAppSettingsData[group].skinBlur),
-					skinImageSize:
-						typeof newSettings?.skinImageSize === "string"
-							? newSettings.skinImageSize
-							: (prevSettings?.skinImageSize ??
-								defaultAppSettingsData[group].skinImageSize),
-					skinMixBlendMode:
-						typeof newSettings?.skinMixBlendMode === "string"
-							? newSettings.skinMixBlendMode
-							: (prevSettings?.skinMixBlendMode ??
-								defaultAppSettingsData[group].skinMixBlendMode),
-					customCss:
-						typeof newSettings?.customCss === "string"
-							? newSettings.customCss
-							: (prevSettings?.customCss ?? ""),
-					skinMaskBlur:
-						typeof newSettings?.skinMaskBlur === "number"
-							? Math.min(Math.max(newSettings.skinMaskBlur, 0), 32)
-							: (prevSettings?.skinMaskBlur ??
-								defaultAppSettingsData[group].skinMaskBlur),
-					skinMaskOpacity:
-						typeof newSettings?.skinMaskOpacity === "number"
-							? Math.min(Math.max(newSettings.skinMaskOpacity, 0), 100)
-							: (prevSettings?.skinMaskOpacity ??
-								defaultAppSettingsData[group].skinMaskOpacity),
-				};
 			} else if (group === AppSettingsGroup.Cache) {
 				newSettings = newSettings as AppSettingsData[typeof group];
 				const prevSettings = appSettingsRef.current[group] as
@@ -331,16 +275,6 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.menuCollapsed === "boolean"
 							? newSettings.menuCollapsed
 							: (prevSettings?.menuCollapsed ?? false),
-					chatModel:
-						typeof newSettings?.chatModel === "string"
-							? newSettings.chatModel
-							: (prevSettings?.chatModel ??
-								defaultAppSettingsData[group].chatModel),
-					chatModelEnableThinking:
-						typeof newSettings?.chatModelEnableThinking === "boolean"
-							? newSettings.chatModelEnableThinking
-							: (prevSettings?.chatModelEnableThinking ??
-								defaultAppSettingsData[group].chatModelEnableThinking),
 					colorPickerColorFormatIndex:
 						typeof newSettings?.colorPickerColorFormatIndex === "number"
 							? newSettings.colorPickerColorFormatIndex
@@ -401,11 +335,6 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.lastDrawExtraTool === "number"
 							? newSettings.lastDrawExtraTool
 							: (prevSettings?.lastDrawExtraTool ?? DrawState.Idle),
-					delayScreenshotSeconds:
-						typeof newSettings?.delayScreenshotSeconds === "number"
-							? newSettings.delayScreenshotSeconds
-							: (prevSettings?.delayScreenshotSeconds ??
-								defaultAppSettingsData[group].delayScreenshotSeconds),
 					lockDragAspectRatio:
 						typeof newSettings?.lockDragAspectRatio === "number"
 							? Math.min(Math.max(newSettings.lockDragAspectRatio, 0), 100)
@@ -544,14 +473,7 @@ const AppSettingsContextProviderCore: React.FC<{
 				const settingsKeySet = new Set<string>();
 				const settingKeys: DrawToolbarKeyEventKey[] = Object.keys(
 					defaultDrawToolbarKeyEventSettings,
-				).filter((key) => {
-					if (
-						key === DrawToolbarKeyEventKey.OcrDetectTool ||
-						key === DrawToolbarKeyEventKey.OcrTranslateTool
-					) {
-						return isReady?.(PLUGIN_ID_RAPID_OCR);
-					}
-
+				).filter((_key) => {
 					return true;
 				}) as DrawToolbarKeyEventKey[];
 				settingKeys.forEach((key) => {
@@ -724,42 +646,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.runLog
 							: (prevSettings?.runLog ?? defaultAppSettingsData[group].runLog),
 				};
-			} else if (group === AppSettingsGroup.SystemChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					maxTokens:
-						typeof newSettings?.maxTokens === "number"
-							? Math.min(Math.max(newSettings.maxTokens, 512), 8192)
-							: (prevSettings?.maxTokens ??
-								defaultAppSettingsData[group].maxTokens),
-					temperature:
-						typeof newSettings?.temperature === "number"
-							? Math.min(Math.max(newSettings.temperature, 0), 2)
-							: (prevSettings?.temperature ??
-								defaultAppSettingsData[group].temperature),
-					thinkingBudgetTokens:
-						typeof newSettings?.thinkingBudgetTokens === "number"
-							? Math.min(Math.max(newSettings.thinkingBudgetTokens, 1024), 8192)
-							: (prevSettings?.thinkingBudgetTokens ??
-								defaultAppSettingsData[group].thinkingBudgetTokens),
-				};
-			} else if (group === AppSettingsGroup.SystemNetwork) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					enableProxy:
-						typeof newSettings?.enableProxy === "boolean"
-							? newSettings.enableProxy
-							: (prevSettings?.enableProxy ??
-								defaultAppSettingsData[group].enableProxy),
-				};
 			} else if (group === AppSettingsGroup.FunctionOcr) {
 				newSettings = newSettings as AppSettingsData[typeof group];
 				const prevSettings = appSettingsRef.current[group] as
@@ -772,51 +658,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.ocrModel
 							: (prevSettings?.ocrModel ??
 								defaultAppSettingsData[group].ocrModel),
-					htmlVisionModel:
-						typeof newSettings?.htmlVisionModel === "string"
-							? newSettings.htmlVisionModel
-							: (prevSettings?.htmlVisionModel ??
-								defaultAppSettingsData[group].htmlVisionModel),
-					htmlVisionModelSystemPrompt:
-						typeof newSettings?.htmlVisionModelSystemPrompt === "string"
-							? newSettings.htmlVisionModelSystemPrompt
-							: (prevSettings?.htmlVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].htmlVisionModelSystemPrompt),
-					markdownVisionModelSystemPrompt:
-						typeof newSettings?.markdownVisionModelSystemPrompt === "string"
-							? newSettings.markdownVisionModelSystemPrompt
-							: (prevSettings?.markdownVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].markdownVisionModelSystemPrompt),
-				};
-			} else if (group === AppSettingsGroup.FunctionChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					autoCreateNewSession:
-						typeof newSettings?.autoCreateNewSession === "boolean"
-							? newSettings.autoCreateNewSession
-							: (prevSettings?.autoCreateNewSession ??
-								defaultAppSettingsData[group].autoCreateNewSession),
-					chatApiConfigList: Array.isArray(newSettings?.chatApiConfigList)
-						? newSettings.chatApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_model: `${item.api_model ?? ""}`,
-								model_name: `${item.model_name ?? ""}`,
-								support_thinking: !!item.support_thinking,
-								support_vision: !!item.support_vision,
-							}))
-						: (prevSettings?.chatApiConfigList ??
-							defaultAppSettingsData[group].chatApiConfigList),
-					autoCreateNewSessionOnCloseWindow:
-						typeof newSettings?.autoCreateNewSessionOnCloseWindow === "boolean"
-							? newSettings.autoCreateNewSessionOnCloseWindow
-							: (prevSettings?.autoCreateNewSessionOnCloseWindow ??
-								defaultAppSettingsData[group]
-									.autoCreateNewSessionOnCloseWindow),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -919,16 +760,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.shortcutCanleTip
 							: (prevSettings?.shortcutCanleTip ??
 								defaultAppSettingsData[group].shortcutCanleTip),
-					cloudSaveUrlFormat:
-						typeof newSettings?.cloudSaveUrlFormat === "string"
-							? (newSettings.cloudSaveUrlFormat as CloudSaveUrlFormat)
-							: (prevSettings?.cloudSaveUrlFormat ??
-								defaultAppSettingsData[group].cloudSaveUrlFormat),
-					cloudProxyUrl:
-						typeof newSettings?.cloudProxyUrl === "string"
-							? newSettings.cloudProxyUrl
-							: (prevSettings?.cloudProxyUrl ??
-								defaultAppSettingsData[group].cloudProxyUrl),
 					autoSaveOnCopy:
 						typeof newSettings?.autoSaveOnCopy === "boolean"
 							? newSettings.autoSaveOnCopy
@@ -947,48 +778,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.copyImageFileToClipboard
 							: (prevSettings?.copyImageFileToClipboard ??
 								defaultAppSettingsData[group].copyImageFileToClipboard),
-					saveToCloud:
-						typeof newSettings?.saveToCloud === "boolean"
-							? newSettings.saveToCloud
-							: (prevSettings?.saveToCloud ?? false),
-					cloudSaveUrlType:
-						typeof newSettings?.cloudSaveUrlType === "string"
-							? (newSettings.cloudSaveUrlType as CloudSaveUrlType)
-							: (prevSettings?.cloudSaveUrlType ?? CloudSaveUrlType.S3),
-					s3AccessKeyId:
-						typeof newSettings?.s3AccessKeyId === "string"
-							? newSettings.s3AccessKeyId
-							: (prevSettings?.s3AccessKeyId ??
-								defaultAppSettingsData[group].s3AccessKeyId),
-					s3SecretAccessKey:
-						typeof newSettings?.s3SecretAccessKey === "string"
-							? newSettings.s3SecretAccessKey
-							: (prevSettings?.s3SecretAccessKey ??
-								defaultAppSettingsData[group].s3SecretAccessKey),
-					s3Region:
-						typeof newSettings?.s3Region === "string"
-							? newSettings.s3Region
-							: (prevSettings?.s3Region ??
-								defaultAppSettingsData[group].s3Region),
-					s3Endpoint:
-						typeof newSettings?.s3Endpoint === "string"
-							? newSettings.s3Endpoint
-							: (prevSettings?.s3Endpoint ??
-								defaultAppSettingsData[group].s3Endpoint),
-					s3BucketName:
-						typeof newSettings?.s3BucketName === "string"
-							? newSettings.s3BucketName
-							: (prevSettings?.s3BucketName ??
-								defaultAppSettingsData[group].s3BucketName),
-					s3PathPrefix:
-						typeof newSettings?.s3PathPrefix === "string"
-							? newSettings.s3PathPrefix
-							: (prevSettings?.s3PathPrefix ??
-								defaultAppSettingsData[group].s3PathPrefix),
-					s3ForcePathStyle:
-						typeof newSettings?.s3ForcePathStyle === "boolean"
-							? newSettings.s3ForcePathStyle
-							: (prevSettings?.s3ForcePathStyle ?? false),
 					saveFileDirectory:
 						typeof newSettings?.saveFileDirectory === "string"
 							? newSettings.saveFileDirectory
@@ -1051,16 +840,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.fullScreenFileNameFormat
 							: (prevSettings?.fullScreenFileNameFormat ??
 								defaultAppSettingsData[group].fullScreenFileNameFormat),
-					videoRecordFileNameFormat:
-						typeof newSettings?.videoRecordFileNameFormat === "string"
-							? newSettings.videoRecordFileNameFormat
-							: (prevSettings?.videoRecordFileNameFormat ??
-								defaultAppSettingsData[group].videoRecordFileNameFormat),
-					uploadToCloudSaveUrlFormat:
-						typeof newSettings?.uploadToCloudSaveUrlFormat === "string"
-							? newSettings.uploadToCloudSaveUrlFormat
-							: (prevSettings?.uploadToCloudSaveUrlFormat ??
-								defaultAppSettingsData[group].uploadToCloudSaveUrlFormat),
 				};
 			} else if (group === AppSettingsGroup.FunctionFullScreenDraw) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -1135,120 +914,11 @@ const AppSettingsContextProviderCore: React.FC<{
 					| undefined;
 
 				settings = {
-					iconPath:
-						typeof newSettings?.iconPath === "string"
-							? newSettings.iconPath
-							: (prevSettings?.iconPath ?? ""),
-					defaultIcons:
-						typeof newSettings?.defaultIcons === "string"
-							? (newSettings.defaultIcons as TrayIconDefaultIcon)
-							: (prevSettings?.defaultIcons ??
-								defaultAppSettingsData[group].defaultIcons),
 					enableTrayIcon:
 						typeof newSettings?.enableTrayIcon === "boolean"
 							? newSettings.enableTrayIcon
 							: (prevSettings?.enableTrayIcon ??
 								defaultAppSettingsData[group].enableTrayIcon),
-					iconPathDark:
-						typeof newSettings?.iconPathDark === "string"
-							? newSettings.iconPathDark
-							: (prevSettings?.iconPathDark ?? ""),
-					defaultIconsDark:
-						typeof newSettings?.defaultIconsDark === "string"
-							? (newSettings.defaultIconsDark as TrayIconDefaultIcon)
-							: (prevSettings?.defaultIconsDark ??
-								defaultAppSettingsData[group].defaultIcons),
-				};
-			} else if (group === AppSettingsGroup.FunctionVideoRecord) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					enableExcludeFromCapture:
-						typeof newSettings?.enableExcludeFromCapture === "boolean"
-							? newSettings.enableExcludeFromCapture
-							: (prevSettings?.enableExcludeFromCapture ??
-								defaultAppSettingsData[group].enableExcludeFromCapture),
-					saveDirectory:
-						typeof newSettings?.saveDirectory === "string"
-							? newSettings.saveDirectory
-							: (prevSettings?.saveDirectory ?? ""),
-					frameRate:
-						typeof newSettings?.frameRate === "number"
-							? Math.min(Math.max(newSettings.frameRate, 1), 120)
-							: (prevSettings?.frameRate ??
-								defaultAppSettingsData[group].frameRate),
-					microphoneDeviceName:
-						typeof newSettings?.microphoneDeviceName === "string"
-							? newSettings.microphoneDeviceName
-							: (prevSettings?.microphoneDeviceName ?? ""),
-					hwaccel:
-						typeof newSettings?.hwaccel === "boolean"
-							? newSettings.hwaccel
-							: (prevSettings?.hwaccel ??
-								defaultAppSettingsData[group].hwaccel),
-					encoder:
-						typeof newSettings?.encoder === "string"
-							? newSettings.encoder
-							: (prevSettings?.encoder ??
-								defaultAppSettingsData[group].encoder),
-					encoderPreset:
-						typeof newSettings?.encoderPreset === "string"
-							? newSettings.encoderPreset
-							: (prevSettings?.encoderPreset ??
-								defaultAppSettingsData[group].encoderPreset),
-					videoMaxSize:
-						typeof newSettings?.videoMaxSize === "string"
-							? (newSettings.videoMaxSize as VideoMaxSize)
-							: (prevSettings?.videoMaxSize ??
-								defaultAppSettingsData[group].videoMaxSize),
-					gifFrameRate:
-						typeof newSettings?.gifFrameRate === "number"
-							? Math.min(Math.max(newSettings.gifFrameRate, 1), 24)
-							: (prevSettings?.gifFrameRate ??
-								defaultAppSettingsData[group].gifFrameRate),
-					gifMaxSize:
-						typeof newSettings?.gifMaxSize === "string"
-							? (newSettings.gifMaxSize as VideoMaxSize)
-							: (prevSettings?.gifMaxSize ??
-								defaultAppSettingsData[group].gifMaxSize),
-					gifFormat:
-						typeof newSettings?.gifFormat === "string"
-							? newSettings.gifFormat
-							: (prevSettings?.gifFormat ??
-								defaultAppSettingsData[group].gifFormat),
-					keyDisplayFontSize:
-						typeof newSettings?.keyDisplayFontSize === "number"
-							? Math.min(Math.max(newSettings.keyDisplayFontSize, 8), 64)
-							: (prevSettings?.keyDisplayFontSize ??
-								defaultAppSettingsData[group].keyDisplayFontSize),
-					keyDisplayBackgroundColor:
-						typeof newSettings?.keyDisplayBackgroundColor === "string"
-							? trim(newSettings.keyDisplayBackgroundColor)
-							: (prevSettings?.keyDisplayBackgroundColor ??
-								defaultAppSettingsData[group].keyDisplayBackgroundColor),
-					keyDisplayTextColor:
-						typeof newSettings?.keyDisplayTextColor === "string"
-							? trim(newSettings.keyDisplayTextColor)
-							: (prevSettings?.keyDisplayTextColor ??
-								defaultAppSettingsData[group].keyDisplayTextColor),
-					keyDisplayDuration:
-						typeof newSettings?.keyDisplayDuration === "number"
-							? Math.min(Math.max(newSettings.keyDisplayDuration, 100), 10000)
-							: (prevSettings?.keyDisplayDuration ??
-								defaultAppSettingsData[group].keyDisplayDuration),
-					keyDisplayMergeDuration:
-						typeof newSettings?.keyDisplayMergeDuration === "number"
-							? Math.min(Math.max(newSettings.keyDisplayMergeDuration, 0), 2000)
-							: (prevSettings?.keyDisplayMergeDuration ??
-								defaultAppSettingsData[group].keyDisplayMergeDuration),
-					keyDisplayDirection:
-						typeof newSettings?.keyDisplayDirection === "string"
-							? newSettings.keyDisplayDirection
-							: (prevSettings?.keyDisplayDirection ??
-								defaultAppSettingsData[group].keyDisplayDirection),
 				};
 			} else if (group === AppSettingsGroup.FunctionFixedContent) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -1354,7 +1024,7 @@ const AppSettingsContextProviderCore: React.FC<{
 				settings = {
 					hotLoadPageCount:
 						typeof newSettings?.hotLoadPageCount === "number"
-							? Math.max(Math.min(3, newSettings.hotLoadPageCount), 0)
+							? Math.max(Math.min(0, newSettings.hotLoadPageCount), 0)
 							: (prevSettings?.hotLoadPageCount ??
 								defaultAppSettingsData[group].hotLoadPageCount),
 				};
@@ -1394,7 +1064,7 @@ const AppSettingsContextProviderCore: React.FC<{
 
 			return settings;
 		},
-		[setAppSettings, isReady, writeAppSettingsDebounce, writeAppSettings],
+		[setAppSettings, writeAppSettingsDebounce, writeAppSettings],
 	);
 
 	const reloadAppSettings = useCallback(async () => {

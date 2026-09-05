@@ -32,7 +32,7 @@ pub struct HotLoadPageService {
 impl HotLoadPageService {
     pub fn new() -> Self {
         Self {
-            page_limit: RwLock::new(10),
+            page_limit: RwLock::new(0),
             page_list: DashMap::new(),
             app_handle: RwLock::new(None),
             page_id: RwLock::new(0),
@@ -79,6 +79,8 @@ impl HotLoadPageService {
         .position(0.0, 0.0)
         .visible(false)
         .focused(false)
+        .additional_browser_args("--js-flags=--max-old-space-size=256")
+
         .build()
         {
             Ok(window) => window,

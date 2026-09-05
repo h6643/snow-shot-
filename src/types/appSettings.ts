@@ -27,20 +27,6 @@ export enum VideoFormat {
 	Gif = "Gif",
 }
 
-export enum VideoMaxSize {
-	P2160 = "2160p",
-	P1440 = "1440p",
-	P1080 = "1080p",
-	P720 = "720p",
-	P480 = "480p",
-}
-
-export enum GifFormat {
-	Gif = "gif",
-	Apng = "apng",
-	Webp = "webp",
-}
-
 export enum OcrDetectAfterAction {
 	/** 不执行任何操作 */
 	None = "none",
@@ -59,15 +45,6 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-export type ChatApiConfig = {
-	api_uri: string;
-	api_key: string;
-	api_model: string;
-	model_name: string;
-	support_thinking: boolean;
-	support_vision: boolean | undefined;
-};
-
 export enum TranslationApiType {
 	DeepL = "translation_api_deepl",
 }
@@ -81,7 +58,6 @@ export type TranslationApiConfig = {
 
 export enum AppSettingsGroup {
 	Common = "common",
-	ThemeSkin = "themeSkin",
 	CommonTrayIcon = "commonTrayIcon",
 	FunctionDraw = "functionDraw",
 	Cache = "cache_20250731",
@@ -92,12 +68,9 @@ export enum AppSettingsGroup {
 	AppFunction = "appFunction",
 	Render = "render",
 	SystemCommon = "systemCommon",
-	SystemChat = "systemChat",
-	SystemNetwork = "systemNetwork",
 	SystemScreenshot = "systemScreenshot_20250627",
 	SystemCore = "systemCore",
 	SystemScrollScreenshot = "systemScrollScreenshot_20250628",
-	FunctionChat = "functionChat",
 	FunctionOcr = "functionOcr",
 	FunctionTranslation = "functionTranslation",
 	FunctionTranslationCache = "functionTranslationCache",
@@ -105,7 +78,6 @@ export enum AppSettingsGroup {
 	FunctionFullScreenDraw = "functionFullScreenDraw",
 	FunctionOutput = "functionOutput_20250908",
 	FunctionFixedContent = "functionFixedContent",
-	FunctionVideoRecord = "functionVideoRecord",
 	FunctionTrayIcon = "functionTrayIcon",
 	FunctionGlobalShortcut = "functionGlobalShortcut",
 }
@@ -139,24 +111,6 @@ export enum TrayIconClickAction {
 	Screenshot = "screenshot",
 }
 
-export enum CloudSaveUrlType {
-	S3 = "s3",
-}
-
-export enum TrayIconDefaultIcon {
-	Default = "default",
-	Light = "light",
-	Dark = "dark",
-	SnowDefault = "snow-default",
-	SnowLight = "snow-light",
-	SnowDark = "snow-dark",
-}
-
-export enum CloudSaveUrlFormat {
-	Origin = "origin",
-	Markdown = "markdown",
-}
-
 export enum DoubleClickAction {
 	Copy = "copy",
 	Save = "save",
@@ -166,8 +120,6 @@ export enum DoubleClickAction {
 
 export enum ExtraToolList {
 	None = 0,
-	ScanQrcode = 1,
-	VideoRecord = 2,
 }
 
 export type SelectRectPreset = {
@@ -202,11 +154,6 @@ export enum OcrModel {
 	RapidOcrV5 = "RapidOcrV5",
 }
 
-export enum KeyDisplayDirection {
-	Horizontal = "horizontal",
-	Vertical = "vertical",
-}
-
 export type AppSettingsData = {
 	[AppSettingsGroup.Common]: {
 		theme: AppSettingsTheme;
@@ -219,42 +166,6 @@ export type AppSettingsData = {
 		language: AppSettingsLanguage;
 		/** 浏览器语言，用于自动切换语言 */
 		browserLanguage: string;
-	};
-	[AppSettingsGroup.ThemeSkin]: {
-		/** 皮肤路径 */
-		skinPath: string;
-		/** 皮肤透明度 */
-		skinOpacity: number;
-		/** 皮肤位置 */
-		skinPosition: "top" | "bottom" | "left" | "right" | "center";
-		/** 皮肤模糊度 */
-		skinBlur: number;
-		/** 皮肤遮罩模糊度 */
-		skinMaskBlur: number;
-		/** 皮肤遮罩透明度 */
-		skinMaskOpacity: number;
-		/** 皮肤图片大小 */
-		skinImageSize: "cover" | "contain" | "fill";
-		/** 皮肤混合模式 */
-		skinMixBlendMode:
-			| "unset"
-			| "multiply"
-			| "screen"
-			| "overlay"
-			| "darken"
-			| "lighten"
-			| "color-dodge"
-			| "color-burn"
-			| "hard-light"
-			| "soft-light"
-			| "difference"
-			| "exclusion"
-			| "hue"
-			| "saturation"
-			| "color"
-			| "luminosity";
-		/** 自定义 CSS */
-		customCss: string;
 	};
 	[AppSettingsGroup.Screenshot]: {
 		/** 界面缩放比例 */
@@ -287,14 +198,6 @@ export type AppSettingsData = {
 		borderColor: string;
 	};
 	[AppSettingsGroup.CommonTrayIcon]: {
-		/** 自定义托盘图标 */
-		iconPath: string;
-		/** 自定义托盘图标（暗黑） */
-		iconPathDark: string;
-		/** 默认图标 */
-		defaultIcons: TrayIconDefaultIcon;
-		/** 默认图标（暗黑） */
-		defaultIconsDark: TrayIconDefaultIcon;
 		/** 启用托盘 */
 		enableTrayIcon: boolean;
 	};
@@ -310,8 +213,6 @@ export type AppSettingsData = {
 	};
 	[AppSettingsGroup.Cache]: {
 		menuCollapsed: boolean;
-		chatModel: string;
-		chatModelEnableThinking: boolean;
 		colorPickerColorFormatIndex: number;
 		prevImageFormat: ImageFormat;
 		prevSelectRect: ElementRect;
@@ -338,8 +239,6 @@ export type AppSettingsData = {
 		lastDrawExtraTool: DrawState;
 		// 上一次水印内容
 		lastWatermarkText: string;
-		/** 延迟截图秒数 */
-		delayScreenshotSeconds: number;
 		/** 锁定手动选区时的宽高比 */
 		lockDragAspectRatio: number;
 		/** Tab 键是否启用查找子元素 */
@@ -362,29 +261,9 @@ export type AppSettingsData = {
 		autoCheckVersion: boolean;
 		runLog: boolean;
 	};
-	[AppSettingsGroup.SystemChat]: {
-		maxTokens: number;
-		temperature: number;
-		thinkingBudgetTokens: number;
-	};
-	[AppSettingsGroup.SystemNetwork]: {
-		enableProxy: boolean;
-	};
-	[AppSettingsGroup.FunctionChat]: {
-		autoCreateNewSession: boolean;
-		/** 关闭窗口时自动创建新会话 */
-		autoCreateNewSessionOnCloseWindow: boolean;
-		chatApiConfigList: ChatApiConfig[];
-	};
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** 将图片转为 HTML 的视觉理解模型 */
-		htmlVisionModel: string;
-		/** 图片转为 HTML 的 System 提示词 */
-		htmlVisionModelSystemPrompt: string;
-		/** 图片转为 Markdown 的 System 提示词 */
-		markdownVisionModelSystemPrompt: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */
@@ -419,29 +298,6 @@ export type AppSettingsData = {
 		doubleClickAction: DoubleClickAction;
 		/** 复制图片文件到剪贴板 */
 		copyImageFileToClipboard: boolean;
-		/** 保存到云端 */
-		saveToCloud: boolean;
-		/** 云端链接格式 */
-		cloudSaveUrlFormat: CloudSaveUrlFormat;
-		/** 云端资源代理网址 */
-		cloudProxyUrl: string;
-		/** 云端保存协议 */
-		cloudSaveUrlType: CloudSaveUrlType;
-		/** S3 访问密钥 ID */
-		s3AccessKeyId: string;
-		/** S3 访问密钥 */
-		s3SecretAccessKey: string;
-		/** S3 区域 */
-		s3Region: string;
-		/** S3 端点 */
-		s3Endpoint: string;
-		/** S3 桶名 */
-		s3BucketName: string;
-		/** S3 路径前缀 */
-		s3PathPrefix: string;
-		/** S3 强制路径样式 */
-		s3ForcePathStyle: boolean;
-		/** 保存文件路径 */
 		saveFileDirectory: string;
 		/** 保存文件格式 */
 		saveFileFormat: ImageFormat;
@@ -463,10 +319,6 @@ export type AppSettingsData = {
 		focusedWindowFileNameFormat: string;
 		/** 截取全屏文件名格式 */
 		fullScreenFileNameFormat: string;
-		/** 视频录制文件名格式 */
-		videoRecordFileNameFormat: string;
-		/** 上传到云端文件名格式 */
-		uploadToCloudSaveUrlFormat: string;
 	};
 	[AppSettingsGroup.FunctionFixedContent]: {
 		/** 以鼠标为中心缩放 */
@@ -483,42 +335,6 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionFullScreenDraw]: {
 		/** 默认工具 */
 		defaultTool: DrawState;
-	};
-	[AppSettingsGroup.FunctionVideoRecord]: {
-		/** 录制画面中隐藏工具栏 */
-		enableExcludeFromCapture: boolean;
-		/** 视频录制保存路径 */
-		saveDirectory: string;
-		/** 帧率 */
-		frameRate: number;
-		/** GIF 帧率 */
-		gifFrameRate: number;
-		/** 麦克风设备 */
-		microphoneDeviceName: string;
-		/** 硬件加速 */
-		hwaccel: boolean;
-		/** 编码器 */
-		encoder: string;
-		/** 编码器预设 */
-		encoderPreset: string;
-		/** 视频最大尺寸 */
-		videoMaxSize: VideoMaxSize;
-		/** GIF 最大尺寸 */
-		gifMaxSize: VideoMaxSize;
-		/** 动图格式 */
-		gifFormat: GifFormat;
-		/** 按键显示字体大小 */
-		keyDisplayFontSize: number;
-		/** 按键显示背景色 */
-		keyDisplayBackgroundColor: string;
-		/** 按键显示文字颜色 */
-		keyDisplayTextColor: string;
-		/** 按键显示持续时间（毫秒） */
-		keyDisplayDuration: number;
-		/** 按键显示合并时间（毫秒） */
-		keyDisplayMergeDuration: number;
-		/** 按键显示方向 */
-		keyDisplayDirection: KeyDisplayDirection;
 	};
 	[AppSettingsGroup.SystemScreenshot]: {
 		historyValidDuration: HistoryValidDuration;

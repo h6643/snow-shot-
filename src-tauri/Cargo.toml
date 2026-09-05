@@ -11,9 +11,7 @@ members = [
     "src-crates/tauri-commands/ocr",
     "src-crates/tauri-commands/screenshot",
     "src-crates/tauri-commands/scroll-screenshot",
-    "src-crates/tauri-commands/http-service",
     "src-crates/webview",
-    "src-crates/http-services",
 ]
 
 [package]
@@ -80,10 +78,8 @@ snow-shot-tauri-commands-file = { path = "src-crates/tauri-commands/file" }
 snow-shot-tauri-commands-ocr = { path = "src-crates/tauri-commands/ocr" }
 snow-shot-tauri-commands-screenshot = { path = "src-crates/tauri-commands/screenshot" }
 snow-shot-tauri-commands-scroll-screenshot = { path = "src-crates/tauri-commands/scroll-screenshot" }
-snow-shot-tauri-commands-http-service = { path = "src-crates/tauri-commands/http-service" }
 snow-shot-plugin-service = { path = "src-crates/plugin-service" }
 snow-shot-webview = { path = "src-crates/webview" }
-snow-shot-http-services = { path = "src-crates/http-services" }
 snow-shot-global-state = { path = "src-crates/global_state" }
 
 
@@ -100,8 +96,6 @@ snow-shot-tauri-commands-scroll-screenshot = { workspace = true }
 snow-shot-plugin-service = { workspace = true }
 snow-shot-app-utils = { workspace = true }
 snow-shot-webview = { workspace = true }
-snow-shot-http-services = { workspace = true }
-snow-shot-tauri-commands-http-service = { workspace = true }
 snow-shot-global-state = { workspace = true }
 
 # workspace 依赖

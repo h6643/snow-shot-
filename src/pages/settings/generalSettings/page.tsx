@@ -6,31 +6,24 @@ import ProForm, {
 	ProFormSlider,
 	ProFormSwitch,
 } from "@ant-design/pro-form";
-import { resourceDir } from "@tauri-apps/api/path";
 import {
-	type CheckboxOptionType,
 	Col,
 	ColorPicker,
 	Divider,
 	Form,
-	Image,
 	Row,
 	Select,
-	Space,
 	Spin,
 	theme,
 } from "antd";
 import type { AggregationColor } from "antd/es/color-picker/color";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContentWrap } from "@/components/contentWrap";
 import { GroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { DarkModeIcon, LanguageIcon } from "@/components/icons";
-import { PathInput } from "@/components/pathInput";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { getDefaultIconPath } from "@/components/trayIconLoader";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -42,7 +35,6 @@ import {
 	AppSettingsLanguage,
 	AppSettingsTheme,
 	ColorPickerShowMode,
-	TrayIconDefaultIcon,
 } from "@/types/appSettings";
 import { DrawState } from "@/types/draw";
 
@@ -181,158 +173,10 @@ export const GeneralSettingsPage = () => {
 				label: intl.formatMessage({ id: "draw.scrollScreenshotTool" }),
 				value: DrawState.ScrollScreenshot,
 			},
-		].filter((item) => {
-			if (
-				item.value === DrawState.OcrDetect ||
-				item.value === DrawState.OcrTranslate
-			) {
-				return isReadyStatus(PLUGIN_ID_RAPID_OCR);
-			}
-
+		].filter((_item) => {
 			return true;
 		});
 	}, [intl, isReadyStatus]);
-
-	const [defaultIconsOptions, setDefaultIconsOptions] = useState<
-		CheckboxOptionType<TrayIconDefaultIcon>[]
-	>([]);
-	const initDefaultIconsOptions = useCallback(async () => {
-		const appDataDir = await resourceDir();
-		const [
-			defaultIconPath,
-			lightIconPath,
-			darkIconPath,
-			snowDefaultIconPath,
-			snowLightIconPath,
-			snowDarkIconPath,
-		] = await Promise.all([
-			getDefaultIconPath(TrayIconDefaultIcon.Default, appDataDir),
-			getDefaultIconPath(TrayIconDefaultIcon.Light, appDataDir),
-			getDefaultIconPath(TrayIconDefaultIcon.Dark, appDataDir),
-			getDefaultIconPath(TrayIconDefaultIcon.SnowDefault, appDataDir),
-			getDefaultIconPath(TrayIconDefaultIcon.SnowLight, appDataDir),
-			getDefaultIconPath(TrayIconDefaultIcon.SnowDark, appDataDir),
-		]);
-
-		const iconSize = 24;
-		setDefaultIconsOptions([
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.default",
-						})}
-						<Image
-							src={defaultIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="default"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.default",
-				}),
-				value: TrayIconDefaultIcon.Default,
-			},
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.light",
-						})}
-						<Image
-							src={lightIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="light"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.light",
-				}),
-				value: TrayIconDefaultIcon.Light,
-			},
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.dark",
-						})}
-						<Image
-							src={darkIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="dark"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.dark",
-				}),
-				value: TrayIconDefaultIcon.Dark,
-			},
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.snowDefault",
-						})}
-						<Image
-							src={snowDefaultIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="snow-default"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.snowDefault",
-				}),
-				value: TrayIconDefaultIcon.SnowDefault,
-			},
-
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.snowLight",
-						})}
-						<Image
-							src={snowLightIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="snow-light"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.snowLight",
-				}),
-				value: TrayIconDefaultIcon.SnowLight,
-			},
-			{
-				label: (
-					<Space>
-						{intl.formatMessage({
-							id: "settings.commonSettings.trayIconSettings.defaultIcons.snowDark",
-						})}
-						<Image
-							src={snowDarkIconPath.web_path}
-							width={iconSize}
-							height={iconSize}
-							alt="snow-dark"
-						/>
-					</Space>
-				),
-				title: intl.formatMessage({
-					id: "settings.commonSettings.trayIconSettings.defaultIcons.snowDark",
-				}),
-				value: TrayIconDefaultIcon.SnowDark,
-			},
-		]);
-	}, [intl]);
 
 	const themeOptions = useMemo(() => {
 		return [
@@ -350,10 +194,6 @@ export const GeneralSettingsPage = () => {
 			},
 		];
 	}, [intl]);
-
-	useEffect(() => {
-		initDefaultIconsOptions();
-	}, [initDefaultIconsOptions]);
 
 	return (
 		<ContentWrap className="settings-wrap">
@@ -796,74 +636,6 @@ export const GeneralSettingsPage = () => {
 									/>
 								}
 							/>
-						</Col>
-
-						<Col span={24}>
-							<ProFormRadio.Group
-								name="defaultIcons"
-								label={
-									<FormattedMessage id="settings.commonSettings.trayIconSettings.defaultIcons" />
-								}
-								options={defaultIconsOptions}
-							/>
-						</Col>
-
-						<Col span={24}>
-							<ProForm.Item
-								name="iconPath"
-								label={
-									<IconLabel
-										label={
-											<FormattedMessage id="settings.commonSettings.trayIconSettings.iconPath" />
-										}
-										tooltipTitle={
-											<FormattedMessage id="settings.commonSettings.trayIconSettings.iconPath.tip" />
-										}
-									/>
-								}
-								required={false}
-							>
-								<PathInput
-									filters={[
-										{ name: "PNG(*.png)", extensions: ["png"] },
-										{ name: "ICO(*.ico)", extensions: ["ico"] },
-									]}
-								/>
-							</ProForm.Item>
-						</Col>
-
-						<Col span={24}>
-							<ProFormRadio.Group
-								name="defaultIconsDark"
-								label={
-									<FormattedMessage id="settings.commonSettings.trayIconSettings.defaultIcons.darkDefault" />
-								}
-								options={defaultIconsOptions}
-							/>
-						</Col>
-
-						<Col span={24}>
-							<ProForm.Item
-								name="iconPathDark"
-								label={
-									<IconLabel
-										label={
-											<FormattedMessage id="settings.commonSettings.trayIconSettings.iconPath.darkDefault" />
-										}
-										tooltipTitle={
-											<FormattedMessage id="settings.commonSettings.trayIconSettings.iconPath.tip" />
-										}
-									/>
-								}
-								required={false}
-							>
-								<PathInput
-									filters={[
-										{ name: "PNG(*.png)", extensions: ["png"] },
-										{ name: "ICO(*.ico)", extensions: ["ico"] },
-									]}
-								/>
-							</ProForm.Item>
 						</Col>
 					</Row>
 				</Spin>

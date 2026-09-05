@@ -47,12 +47,7 @@ export const en = {
 	"settings.systemSettings.commonSettings.autoStart": "Launch at Startup",
 	"settings.hotKeySettings.translation": "Translation Hotkey",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
-	"settings.chatSettings.maxTokens": "Max Tokens",
-	"settings.chatSettings.maxTokens.tip":
-		"Maximum number of tokens the model will generate in a response",
-	"settings.chatSettings.temperature": "Temperature",
-	"settings.chatSettings.temperature.tip":
-		"Higher values (e.g., 0.8) make outputs more random; lower values (e.g., 0.2) make them focused/deterministic",
+
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
 	"home.translationFunction": "Translation Feature",
@@ -168,20 +163,6 @@ export const en = {
 	"tools.translation.replace": "Replace",
 	"tools.translation.getSelectText.loading": "Retrieving selected text",
 	"tools.translation.getSelectText.failed": "Failed to retrieve",
-	"tools.chat.placeholder": "Send a message",
-	"tools.chat.welcome.title": "👋 Hello, how can I help you?",
-	"tools.chat.welcome.description":
-		"I'm an AI assistant. Feel free to ask me anything!",
-	"tools.chat.requestAborted": "Request aborted",
-	"tools.chat.requestFailed": "Request failed, please try again",
-	"tools.chat.agentPlaceholder": "Generating content...",
-	"tools.chat.newSession.tip": "New session created",
-	"tools.chat.session.current": "Current",
-	"tools.chat.sessions": "Sessions",
-	"tools.chat.newSession": "New Session",
-	"tools.chat.session.clear": "Clear All Sessions",
-	"tools.chat.session.clear.tip": "Confirm to clear all sessions?",
-	"tools.chat.reasoner": "Reasoning",
 	"tools.chat.custom": "Custom",
 	"tools.translation.type": "Translation Service",
 	"tools.translation.domain": "Translation Domain",
@@ -193,10 +174,7 @@ export const en = {
 	"tools.translation.domain.finance": "Finance",
 	"tools.translation.domain.game": "Gaming",
 	"settings.systemSettings.networkSettings": "Network Settings",
-	"settings.systemSettings.networkSettings.proxy": "System Proxy",
-	"settings.chatSettings.thinkingBudgetTokens": "Thinking Budget Tokens",
-	"settings.chatSettings.thinkingBudgetTokens.tip":
-		'For reasoning modes like Claude models, the thinking budget determines the maximum number of tokens for their internal reasoning process. Note: The thinking budget tokens cannot be less than "Max Tokens", therefore if this value is effective, the "Max Tokens" may be determined by the server',
+
 	"about.title": "Snow Shot",
 	"about.subtitle":
 		"A tool software designed with simplicity and elegance as the concept ❄️",
@@ -229,22 +207,4 @@ export const en = {
 	"common.permission.error.description":
 		'Please enable necessary permissions for "Screen Recording & System Audio" and "Accessibility"',
 	"common.permission.error.goToSettings": "Go to Settings",
-	"settings.functionSettings.videoRecordSettings.keyDisplaySettings":
-		"Key Display",
-	"settings.functionSettings.videoRecordSettings.keyDisplayFontSize":
-		"Font Size",
-	"settings.functionSettings.videoRecordSettings.keyDisplayBackgroundColor":
-		"Background Color",
-	"settings.functionSettings.videoRecordSettings.keyDisplayTextColor":
-		"Text Color",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDuration":
-		"Duration",
-	"settings.functionSettings.videoRecordSettings.keyDisplayMergeDuration":
-		"Merge Time",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection":
-		"Direction",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.horizontal":
-		"Horizontal",
-	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.vertical":
-		"Vertical",
 };

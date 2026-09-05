@@ -8,14 +8,6 @@ export const getSelectedText = async () => {
 	return result;
 };
 
-export const setEnableProxy = async (enable: boolean) => {
-	const result = await invoke<string>("set_enable_proxy", {
-		enable,
-		host: "127.0.0.1,localhost,snowshot.top,120.79.232.67,snowshot.mgchao.top",
-	});
-	return result;
-};
-
 export const scrollThrough = async (length: number) => {
 	const result = await invoke<void>("scroll_through", {
 		length,
@@ -78,16 +70,6 @@ export type MonitorInfo = {
 	mouse_y: number;
 };
 
-export const getCurrentMonitorInfo = async () => {
-	const result = await invoke<MonitorInfo>("get_current_monitor_info");
-	return result;
-};
-
-export const enableFreeDrag = async () => {
-	const result = await invoke<void>("enable_free_drag");
-	return result;
-};
-
 export const startFreeDrag = async () => {
 	const result = await invoke<void>("start_free_drag");
 	return result;
@@ -119,28 +101,8 @@ export const sendNewVersionNotification = async (
 	return result;
 };
 
-export const createVideoRecordWindow = async (
-	selectRectMinX: number,
-	selectRectMinY: number,
-	selectRectMaxX: number,
-	selectRectMaxY: number,
-) => {
-	const result = await invoke<void>("create_video_record_window", {
-		selectRectMinX,
-		selectRectMinY,
-		selectRectMaxX,
-		selectRectMaxY,
-	});
-	return result;
-};
-
-export const closeVideoRecordWindow = async () => {
-	const result = await invoke<void>("close_video_record_window");
-	return result;
-};
-
-export const hasVideoRecordWindow = async () => {
-	const result = await invoke<boolean>("has_video_record_window");
+export const getCurrentMonitorInfo = async () => {
+	const result = await invoke<MonitorInfo>("get_current_monitor_info");
 	return result;
 };
 

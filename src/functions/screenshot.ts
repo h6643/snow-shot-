@@ -1,7 +1,7 @@
 import { emit } from "@tauri-apps/api/event";
 import * as tauriLog from "@tauri-apps/plugin-log";
 import { captureFocusedWindow } from "@/commands/screenshot";
-import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat";
+import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/screenshot";
 import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
 import { getCorrectHdrColorAlgorithm } from "@/utils/appSettings";
 import { playCameraShutterSound } from "@/utils/audio";

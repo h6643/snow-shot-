@@ -14,11 +14,7 @@ import {
 	defaultDrawToolbarKeyEventComponentConfig,
 	defaultDrawToolbarKeyEventSettings,
 } from "@/constants/drawToolbarKeyEvent";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -91,15 +87,8 @@ export const HotKeySettingsPage = () => {
 					}
 				}
 
-				if (key === DrawToolbarKeyEventKey.OcrDetectTool) {
-					return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
-				}
-
 				if (key === DrawToolbarKeyEventKey.OcrTranslateTool) {
-					return (
-						isReadyStatus?.(PLUGIN_ID_RAPID_OCR) &&
-						isReadyStatus?.(PLUGIN_ID_TRANSLATE)
-					);
+					return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 				}
 
 				return true;
@@ -149,7 +138,6 @@ export const HotKeySettingsPage = () => {
 	const keyEventFormItemList = useMemo(() => {
 		const groupFormItemMap: Record<CommonKeyEventGroup, React.ReactNode[]> = {
 			[CommonKeyEventGroup.Translation]: [],
-			[CommonKeyEventGroup.Chat]: [],
 			[CommonKeyEventGroup.FixedContent]: [],
 		};
 
@@ -210,11 +198,7 @@ export const HotKeySettingsPage = () => {
 				form={commonKeyEventForm}
 			>
 				{keyEventFormItemListKeys
-					.filter((configGroup) => {
-						if (configGroup === CommonKeyEventGroup.Chat) {
-							return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-						}
-
+					.filter((_configGroup) => {
 						return true;
 					})
 					.map((configGroup, index) => {

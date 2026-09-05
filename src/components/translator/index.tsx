@@ -25,7 +25,6 @@ import {
 	useTranslationRequest,
 } from "@/core/translations";
 import { useStateRef } from "@/hooks/useStateRef";
-import { ModelSelectLabel } from "@/pages/tools/chat/components/modelSelectLabel";
 import { TranslationApiType } from "@/types/appSettings";
 import { TranslationDomain } from "@/types/servies/translation";
 import { writeTextToClipboard } from "@/utils/clipboard";
@@ -220,12 +219,12 @@ export const useTranslationTypeOptions = (
 		supportedTranslationTypes.forEach((item) => {
 			if (item.isOfficial) {
 				officialTranslationTypeOptions.push({
-					label: <ModelSelectLabel modelName={item.name} />,
+					label: <span>{item.name}</span>,
 					value: item.type,
 				});
 			} else {
 				customTranslationTypeOptions.push({
-					label: <ModelSelectLabel modelName={item.name} />,
+					label: <span>{item.name}</span>,
 					value: item.type,
 				});
 			}

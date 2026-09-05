@@ -28,7 +28,6 @@ import { listenKeyStart, listenKeyStop } from "@/commands/listenKey";
 import { captureAllMonitors, switchAlwaysOnTop } from "@/commands/screenshot";
 import {
 	scrollScreenshotClear,
-	scrollScreenshotGetImageData,
 	scrollScreenshotGetSize,
 	scrollScreenshotSaveToClipboard,
 	scrollScreenshotSaveToFile,
@@ -72,7 +71,6 @@ import {
 } from "@/utils/appStore";
 import {
 	writeFilePathToClipboard,
-	writeHtmlToClipboard,
 	writeTextToClipboard,
 } from "@/utils/clipboard";
 import {
@@ -93,7 +91,6 @@ import {
 	covertOcrResultToText,
 	OcrResultType,
 } from "../fixedContent/components/ocrResult";
-import { getOcrResultIframeSrcDoc } from "../fixedContent/components/ocrResult/extra";
 import {
 	DrawContext as CommonDrawContext,
 	type DrawContextType as CommonDrawContextType,
@@ -103,7 +100,6 @@ import {
 	fixedToScreen,
 	getCanvas,
 	handleOcrDetect,
-	saveCanvasToCloud,
 	saveToFile,
 } from "./actions";
 import {
@@ -123,7 +119,7 @@ import {
 } from "./components/drawToolbar";
 import { EnableKeyEventPublisher } from "./components/drawToolbar/components/keyEventWrap/extra";
 import { isOcrTool } from "./components/drawToolbar/components/tools/ocrTool";
-import { ScanQrcodeTool } from "./components/drawToolbar/components/tools/scanQrcodeTool";
+
 import {
 	OcrBlocks,
 	type OcrBlocksActionType,
@@ -558,9 +554,7 @@ const DrawPageCore: React.FC<{
 		);
 
 		await Promise.all([
-			getScreenshotType()?.type === ScreenshotType.Delay
-				? Promise.resolve()
-				: showWindow(captureBoundingBoxInfoRef.current.rect),
+			showWindow(captureBoundingBoxInfoRef.current.rect),
 			captureBoundingBoxInfoRef.current
 				? selectLayerActionRef.current?.onCaptureBoundingBoxInfoReady(
 						captureBoundingBoxInfoRef.current,
@@ -571,7 +565,7 @@ const DrawPageCore: React.FC<{
 				captureBoundingBoxInfoRef.current.height,
 			),
 		]);
-	}, [getAppSettings, getScreenshotType, message, showWindow]);
+	}, [getAppSettings, message, showWindow]);
 
 	const captureAllMonitorsAction = useCallback(
 		async (
@@ -579,15 +573,6 @@ const DrawPageCore: React.FC<{
 		): Promise<ImageBuffer | ImageSharedBufferData | undefined> => {
 			if (excuteScreenshotType === ScreenshotType.SwitchCaptureHistory) {
 				return undefined;
-			}
-
-			if (excuteScreenshotType === ScreenshotType.Delay) {
-				await new Promise((resolve) => {
-					setTimeout(() => {
-						resolve(undefined);
-					}, 1000 *
-						getAppSettings()[AppSettingsGroup.Cache].delayScreenshotSeconds);
-				});
 			}
 
 			const imageBufferFromSharedBufferPromise = getImageBufferFromSharedBuffer(
@@ -615,16 +600,9 @@ const DrawPageCore: React.FC<{
 				result = await imageBufferFromSharedBufferPromise;
 			}
 
-			if (
-				excuteScreenshotType === ScreenshotType.Delay &&
-				captureBoundingBoxInfoRef.current
-			) {
-				showWindow(captureBoundingBoxInfoRef.current.rect);
-			}
-
 			return result;
 		},
-		[getAppSettings, showWindow],
+		[getAppSettings],
 	);
 
 	/** 执行截图 */
@@ -929,53 +907,6 @@ const DrawPageCore: React.FC<{
 		],
 	);
 
-	const onSaveToCloud = useCallback(async () => {
-		if (!getAppSettings()[AppSettingsGroup.FunctionScreenshot].saveToCloud) {
-			return;
-		}
-
-		if (
-			!selectLayerActionRef.current ||
-			!imageLayerActionRef.current ||
-			!drawLayerActionRef.current
-		) {
-			return;
-		}
-
-		let imageData: ArrayBuffer | HTMLCanvasElement | undefined;
-		if (getDrawState() === DrawState.ScrollScreenshot) {
-			imageData = await scrollScreenshotGetImageData(true);
-		} else {
-			imageData = await getCanvas(
-				selectLayerActionRef.current.getSelectRectParams(),
-				imageLayerActionRef.current,
-				drawLayerActionRef.current,
-			);
-		}
-
-		if (!imageData) {
-			return;
-		}
-
-		const hideLoading = message.loading(
-			<FormattedMessage id="draw.saveToCloud.loading" />,
-		);
-
-		try {
-			const result = await saveCanvasToCloud(imageData, getAppSettings());
-			if (typeof result === "object" && "error" in result) {
-				message.error(<FormattedMessage id="draw.saveToCloud.error" />);
-			} else {
-				writeTextToClipboard(result);
-				finishCapture();
-			}
-		} catch (error) {
-			appError("[DrawPageCore] S3 upload error", error);
-		}
-
-		hideLoading();
-	}, [finishCapture, getAppSettings, message, getDrawState]);
-
 	const onFixed = useCallback(async () => {
 		if (getDrawState() === DrawState.ScrollScreenshot) {
 			const scrollScreenshotSize = await scrollScreenshotGetSize();
@@ -1140,11 +1071,6 @@ const DrawPageCore: React.FC<{
 		let selectedText: OcrBlocksSelectedText | undefined;
 		if (isOcrTool(getDrawState())) {
 			selectedText = ocrBlocksActionRef.current?.getSelectedText();
-		} else if (getDrawState() === DrawState.ScanQrcode) {
-			selectedText = {
-				type: "text",
-				text: window.getSelection()?.toString().trim() ?? "",
-			};
 		}
 
 		const ocrResult = ocrBlocksActionRef.current
@@ -1153,20 +1079,14 @@ const DrawPageCore: React.FC<{
 		if (
 			selectedText &&
 			selectedText.text.trim() !== "" &&
-			(isOcrTool(getDrawState()) || getDrawState() === DrawState.ScanQrcode)
+			isOcrTool(getDrawState())
 		) {
-			if (selectedText.type === "visionModelHtml") {
-				writeHtmlToClipboard(selectedText.text);
-			} else {
-				writeTextToClipboard(selectedText.text);
-			}
+			writeTextToClipboard(selectedText.text);
 			finishCapture();
 			return;
 		} else if (
 			isOcrTool(getDrawState()) &&
-			(getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText ||
-				ocrResult?.ocrResultType === OcrResultType.VisionModelHtml ||
-				ocrResult?.ocrResultType === OcrResultType.VisionModelMarkdown)
+			getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText
 		) {
 			if (
 				ocrResult &&
@@ -1174,23 +1094,6 @@ const DrawPageCore: React.FC<{
 					ocrResult.ocrResultType === OcrResultType.Translated)
 			) {
 				writeTextToClipboard(covertOcrResultToText(ocrResult.result));
-			} else if (
-				ocrResult &&
-				ocrResult.ocrResultType === OcrResultType.VisionModelHtml
-			) {
-				const html = getOcrResultIframeSrcDoc(
-					ocrResult.result.text_blocks[0].text,
-					ocrResult.ocrResultType,
-					undefined,
-					undefined,
-					undefined,
-				);
-				writeHtmlToClipboard(html);
-			} else if (
-				ocrResult &&
-				ocrResult.ocrResultType === OcrResultType.VisionModelMarkdown
-			) {
-				writeTextToClipboard(ocrResult.result.text_blocks[0].text);
 			}
 
 			finishCapture();
@@ -1567,8 +1470,6 @@ const DrawPageCore: React.FC<{
 				>
 					<CaptureHistoryController actionRef={captureHistoryActionRef} />
 
-					<ScanQrcodeTool />
-
 					<OcrBlocks
 						actionRef={ocrBlocksActionRef}
 						finishCapture={finishCapture}
@@ -1587,7 +1488,6 @@ const DrawPageCore: React.FC<{
 						actionRef={drawToolbarActionRef}
 						onCancel={finishCapture}
 						onSave={onSave}
-						onSaveToCloud={onSaveToCloud}
 						onFixed={onFixed}
 						onCopyToClipboard={onCopyToClipboard}
 						onOcrDetect={onOcrDetect}

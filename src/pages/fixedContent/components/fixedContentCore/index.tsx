@@ -32,14 +32,9 @@ import {
 	setWindowRect,
 	startFreeDrag,
 } from "@/commands/core";
-import { showMainWindow } from "@/commands/videoRecord";
 import { OcrTranslateIcon } from "@/components/icons";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -55,10 +50,7 @@ import { useStateRef } from "@/hooks/useStateRef";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import { useTempInfo } from "@/hooks/useTempInfo";
 import { useTextScaleFactor } from "@/hooks/useTextScaleFactor";
-import {
-	copyToClipboard as copyToClipboardDrawAction,
-	saveCanvasToCloud,
-} from "@/pages/draw/actions";
+import { copyToClipboard as copyToClipboardDrawAction } from "@/pages/draw/actions";
 import type { SelectRectParams } from "@/pages/draw/components/selectLayer";
 import {
 	type CaptureBoundingBoxInfo,
@@ -78,7 +70,7 @@ import { formatKey } from "@/utils/format";
 import { appError } from "@/utils/log";
 import { MousePosition } from "@/utils/mousePosition";
 import { TweenAnimation } from "@/utils/tweenAnimation";
-import { closeWindowComplete } from "@/utils/window";
+import { closeWindowComplete, showWindow } from "@/utils/window";
 import { zIndexs } from "@/utils/zIndex";
 import {
 	type AllOcrResult,
@@ -88,7 +80,6 @@ import {
 	type OcrResultActionType,
 	OcrResultType,
 } from "../ocrResult";
-import { getOcrResultIframeSrcDoc } from "../ocrResult/extra";
 import { renderToCanvasAction } from "./actions";
 import {
 	DrawLayer,
@@ -217,9 +208,6 @@ const FixedContentCoreInner: React.FC<{
 		AppSettingsPublisher,
 		useCallback((settings: AppSettingsData) => {
 			setFixedBorderColor(settings[AppSettingsGroup.FixedContent].borderColor);
-			setEnableSaveToCloud(
-				settings[AppSettingsGroup.FunctionScreenshot].saveToCloud,
-			);
 			setHotkeys(settings[AppSettingsGroup.CommonKeyEvent]);
 			setEnableTrayIcon(
 				settings[AppSettingsGroup.CommonTrayIcon].enableTrayIcon,
@@ -261,8 +249,6 @@ const FixedContentCoreInner: React.FC<{
 		x: 100,
 		y: 100,
 	});
-
-	const [enableSaveToCloud, setEnableSaveToCloud] = useState(false);
 	const [fixedContentType, setFixedContentType, fixedContentTypeRef] =
 		useStateRef<FixedContentType | undefined>(undefined);
 	const [showBorder, setShowBorder] = useState(true);
@@ -283,12 +269,6 @@ const FixedContentCoreInner: React.FC<{
 	const [translatorOcrResult, setTranslatorOcrResult] = useState<
 		AppOcrResult | undefined
 	>(undefined);
-	const [visionModelHtmlResult, setVisionModelHtmlResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
-	const [visionModelMarkdownResult, setVisionModelMarkdownResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
 	const [translateLoading, setTranslateLoading] = useState(false);
 	const enableOcrTranslate = useMemo(() => {
 		return (
@@ -298,20 +278,6 @@ const FixedContentCoreInner: React.FC<{
 			isReadyStatus?.(PLUGIN_ID_TRANSLATE)
 		);
 	}, [fixedContentType, enableSelectText, ocrResult, isReadyStatus]);
-	const enableVisionModelHtml = useMemo(() => {
-		return (
-			getSelectTextMode(fixedContentType) === "ocr" &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_AI_CHAT)
-		);
-	}, [fixedContentType, enableSelectText, isReadyStatus]);
-	const enableVisionModelMarkdown = useMemo(() => {
-		return (
-			getSelectTextMode(fixedContentType) === "ocr" &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_AI_CHAT)
-		);
-	}, [fixedContentType, enableSelectText, isReadyStatus]);
 
 	const [textContent, setTextContent, textContentRef] = useStateRef<
 		| {
@@ -795,10 +761,7 @@ const FixedContentCoreInner: React.FC<{
 			selectRectParamsRef.current = selectRectParams;
 
 			if (
-				!(
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
-					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
-				) &&
+				!getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr &&
 				!params.allOcrResult
 			) {
 				imageOcrSignRef.current = false;
@@ -859,7 +822,6 @@ const FixedContentCoreInner: React.FC<{
 					setEnableSelectText(true);
 					ocrResultActionRef.current.setEnable(true);
 				} else if (
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
 					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
 				) {
 					ocrResultActionRef.current?.init({
@@ -881,7 +843,6 @@ const FixedContentCoreInner: React.FC<{
 		[
 			setEnableSelectText,
 			setWindowSize,
-			isReady,
 			onDrawLoad,
 			tryInitImageLayer,
 			getAppSettings,
@@ -1135,22 +1096,9 @@ const FixedContentCoreInner: React.FC<{
 						return;
 					}
 
-					if (
-						currentOcrResult.ocrResultType === OcrResultType.VisionModelHtml
-					) {
-						const html = getOcrResultIframeSrcDoc(
-							currentOcrResult.result.text_blocks[0].text,
-							currentOcrResult.ocrResultType,
-							undefined,
-							undefined,
-							undefined,
-						);
-						await writeHtmlToClipboard(html);
-					} else {
-						await writeTextToClipboard(
-							covertOcrResultToText(currentOcrResult.result),
-						);
-					}
+					await writeTextToClipboard(
+						covertOcrResultToText(currentOcrResult.result),
+					);
 				}
 			} else {
 				if (fixedContentTypeRef.current === FixedContentType.Html) {
@@ -1316,66 +1264,6 @@ const FixedContentCoreInner: React.FC<{
 			}
 		}
 	}, [ocrResult, translatorOcrResult, currentOcrResult?.ocrResultType]);
-	const switchVisionModelHtml = useCallback(async () => {
-		if (ocrResult) {
-			if (visionModelHtmlResult) {
-				ocrResultActionRef.current?.switchOcrResult(
-					currentOcrResult?.ocrResultType === OcrResultType.VisionModelHtml
-						? OcrResultType.Ocr
-						: OcrResultType.VisionModelHtml,
-				);
-			} else {
-				const contentCanvas = await renderToCanvas(true);
-				if (!contentCanvas) {
-					message.error(
-						intl.formatMessage({
-							id: "draw.ocrDetect.failedToRenderContent",
-						}),
-					);
-					return;
-				}
-
-				ocrResultActionRef.current?.convertImageToHtml(contentCanvas);
-			}
-		}
-	}, [
-		ocrResult,
-		visionModelHtmlResult,
-		currentOcrResult?.ocrResultType,
-		renderToCanvas,
-		intl,
-		message,
-	]);
-	const switchVisionModelMarkdown = useCallback(async () => {
-		if (ocrResult) {
-			if (visionModelMarkdownResult) {
-				ocrResultActionRef.current?.switchOcrResult(
-					currentOcrResult?.ocrResultType === OcrResultType.VisionModelMarkdown
-						? OcrResultType.Ocr
-						: OcrResultType.VisionModelMarkdown,
-				);
-			} else {
-				const contentCanvas = await renderToCanvas(true);
-				if (!contentCanvas) {
-					message.error(
-						intl.formatMessage({
-							id: "draw.ocrDetect.failedToRenderContent",
-						}),
-					);
-					return;
-				}
-
-				ocrResultActionRef.current?.convertImageToMarkdown(contentCanvas);
-			}
-		}
-	}, [
-		ocrResult,
-		visionModelMarkdownResult,
-		currentOcrResult?.ocrResultType,
-		renderToCanvas,
-		intl,
-		message,
-	]);
 
 	const switchAlwaysOnTop = useCallback(async () => {
 		setIsAlwaysOnTop((isAlwaysOnTop) => !isAlwaysOnTop);
@@ -1627,27 +1515,6 @@ const FixedContentCoreInner: React.FC<{
 		};
 	}, []);
 
-	const onSaveToCloud = useCallback(async () => {
-		const imageCanvas = await renderToCanvas();
-
-		if (!imageCanvas) {
-			return;
-		}
-
-		const hideLoading = message.loading(
-			<FormattedMessage id="draw.saveToCloud.loading" />,
-		);
-
-		const result = await saveCanvasToCloud(imageCanvas, getAppSettings());
-		if (typeof result === "object" && "error" in result) {
-			message.error(<FormattedMessage id="draw.saveToCloud.error" />);
-		} else {
-			writeTextToClipboard(result);
-		}
-
-		hideLoading();
-	}, [getAppSettings, message, renderToCanvas]);
-
 	const createRightClickMenu = useCallback(async (): Promise<
 		| {
 				mainMenu: Menu | undefined;
@@ -1802,50 +1669,17 @@ const FixedContentCoreInner: React.FC<{
 
 		const mainMenu = await Menu.new({
 			items: [
-				...(enableOcrTranslate || enableVisionModelHtml
+				...(enableOcrTranslate
 					? [
-							...(enableOcrTranslate
-								? [
-										{
-											id: `${appWindow.label}-ocrTranslateTool`,
-											text: intl.formatMessage({
-												id: "draw.ocrTranslateTool",
-											}),
-											action: switchOcrTranslate,
-											checked:
-												currentOcrResult?.ocrResultType ===
-												OcrResultType.Translated,
-										},
-									]
-								: []),
-							...(enableVisionModelHtml
-								? [
-										{
-											id: `${appWindow.label}-convertImageToHtml`,
-											text: intl.formatMessage({
-												id: "draw.ocrDetect.convertImageToHtml",
-											}),
-											action: switchVisionModelHtml,
-											checked:
-												currentOcrResult?.ocrResultType ===
-												OcrResultType.VisionModelHtml,
-										},
-									]
-								: []),
-							...(enableVisionModelMarkdown
-								? [
-										{
-											id: `${appWindow.label}-convertImageToMarkdown`,
-											text: intl.formatMessage({
-												id: "draw.ocrDetect.convertImageToMarkdown",
-											}),
-											action: switchVisionModelMarkdown,
-											checked:
-												currentOcrResult?.ocrResultType ===
-												OcrResultType.VisionModelMarkdown,
-										},
-									]
-								: []),
+							{
+								id: `${appWindow.label}-ocrTranslateTool`,
+								text: intl.formatMessage({
+									id: "draw.ocrTranslateTool",
+								}),
+								action: switchOcrTranslate,
+								checked:
+									currentOcrResult?.ocrResultType === OcrResultType.Translated,
+							},
 							{
 								item: "Separator",
 							},
@@ -1874,31 +1708,19 @@ const FixedContentCoreInner: React.FC<{
 					enabled: !isThumbnail,
 					action: saveToFile,
 				},
-				...(enableSaveToCloud
-					? [
-							{
-								id: `${appWindow.label}-saveToCloudTool`,
-								text: intl.formatMessage({ id: "draw.saveToCloudTool" }),
-								action: onSaveToCloud,
-							},
-						]
-					: []),
-				isReadyStatus(PLUGIN_ID_RAPID_OCR) ||
-				getSelectTextMode(fixedContentType) !== "ocr"
-					? {
-							id: `${appWindow.label}-ocrTool`,
-							text:
-								getSelectTextMode(fixedContentType) === "ocr"
-									? intl.formatMessage({ id: "draw.showOrHideOcrResult" })
-									: intl.formatMessage({ id: "draw.selectText" }),
-							accelerator: formatKey(
-								hotkeys?.[CommonKeyEventKey.FixedContentSelectText]?.hotKey,
-							),
-							checked: enableSelectText,
-							enabled: !isThumbnail,
-							action: switchSelectText,
-						}
-					: undefined,
+				{
+					id: `${appWindow.label}-ocrTool`,
+					text:
+						getSelectTextMode(fixedContentType) === "ocr"
+							? intl.formatMessage({ id: "draw.showOrHideOcrResult" })
+							: intl.formatMessage({ id: "draw.selectText" }),
+					accelerator: formatKey(
+						hotkeys?.[CommonKeyEventKey.FixedContentSelectText]?.hotKey,
+					),
+					checked: enableSelectText,
+					enabled: !isThumbnail,
+					action: switchSelectText,
+				},
 				{
 					item: "Separator",
 				},
@@ -2036,7 +1858,7 @@ const FixedContentCoreInner: React.FC<{
 								id: `${appWindow.label}-showMainWindowTool`,
 								text: intl.formatMessage({ id: "home.showMainWindow" }),
 								action: () => {
-									showMainWindow();
+									showWindow();
 								},
 							},
 						]
@@ -2092,12 +1914,6 @@ const FixedContentCoreInner: React.FC<{
 		currentOcrResult?.ocrResultType,
 		enableOcrTranslate,
 		switchOcrTranslate,
-		enableVisionModelHtml,
-		switchVisionModelHtml,
-		switchVisionModelMarkdown,
-		enableVisionModelMarkdown,
-		enableSaveToCloud,
-		onSaveToCloud,
 		enableTrayIcon,
 	]);
 
@@ -2621,8 +2437,6 @@ const FixedContentCoreInner: React.FC<{
 					}}
 					onOcrResultChange={setOcrResult}
 					onTranslatedResultChange={setTranslatorOcrResult}
-					onVisionModelHtmlResultChange={setVisionModelHtmlResult}
-					onVisionModelMarkdownResultChange={setVisionModelMarkdownResult}
 					onCurrentOcrResultChange={setCurrentOcrResult}
 					onTranslateLoading={setTranslateLoading}
 				/>

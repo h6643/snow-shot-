@@ -20,8 +20,6 @@ export const zIndexs = {
 	Draw_SerialNumberToolMask: 106,
 	/** 截图 OCR 结果 */
 	Draw_OcrResult: 107,
-	/** 截图二维码扫描结果 */
-	Draw_ScanQrcodeResult: 108,
 	/** 截图选择图层 */
 	Draw_SelectLayer: 109,
 	/** 截图滚动截图缩略图 */
@@ -58,13 +56,6 @@ export const zIndexs = {
 	/** 全屏截图绘制工具栏 hover 状态 */
 	FullScreenDraw_ToolbarHover: 208,
 	// FullscreenDraw 全屏截图窗口 END
-
-	// VideoRecord 视频录制窗口 BEGIN
-	/** 视频录制工具栏 */
-	VideoRecord_Toolbar: 101,
-	/** 视频录制工具栏拖动区域 */
-	VideoRecord_ToolbarDragRegion: 999,
-	// VideoRecord 视频录制窗口 END
 
 	// 固定到屏幕窗口 BEGIN
 	/** 边框 */

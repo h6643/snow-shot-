@@ -43,12 +43,7 @@ export const zhHant = {
 	"settings.systemSettings.commonSettings.autoStart": "開機自動啟動",
 	"settings.hotKeySettings.translation": "翻譯快速鍵",
 	"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
-	"settings.chatSettings.maxTokens": "最大 Token 數",
-	"settings.chatSettings.maxTokens.tip":
-		"限制一次請求中模型產生 completion 的最大 token 數",
-	"settings.chatSettings.temperature": "Temperature",
-	"settings.chatSettings.temperature.tip":
-		"更高的值，如 0.8，會使輸出更隨機，而更低的值，如 0.2，會使其更加集中和確定",
+
 	"home.commonFunction": "常用功能",
 	"home.screenshotFunction": "截圖功能",
 	"home.translationFunction": "翻譯功能",
@@ -162,20 +157,6 @@ export const zhHant = {
 	"tools.translation.replace": "替換",
 	"tools.translation.getSelectText.loading": "取得選取的文字中",
 	"tools.translation.getSelectText.failed": "取得失敗",
-	"tools.chat.placeholder": "發送訊息",
-	"tools.chat.welcome.title": "👋 Hello, 有什麼可以幫你的嗎？",
-	"tools.chat.welcome.description":
-		"我是 AI 助手，有任何問題都可以問我，我會盡力幫助你~",
-	"tools.chat.requestAborted": "請求被中止",
-	"tools.chat.requestFailed": "抱歉，請求失敗了，請再試一次",
-	"tools.chat.agentPlaceholder": "生成內容中，請稍後...",
-	"tools.chat.newSession.tip": "已經是新的對話了",
-	"tools.chat.session.current": "當前",
-	"tools.chat.sessions": "對話",
-	"tools.chat.newSession": "新對話",
-	"tools.chat.session.clear": "清除所有對話",
-	"tools.chat.session.clear.tip": "確定要清空所有對話嗎？",
-	"tools.chat.reasoner": "推理",
 	"tools.chat.custom": "自訂",
 	"tools.translation.type": "翻譯服務",
 	"tools.translation.domain": "翻譯領域",
@@ -187,10 +168,7 @@ export const zhHant = {
 	"tools.translation.domain.finance": "金融領域",
 	"tools.translation.domain.game": "遊戲領域",
 	"settings.systemSettings.networkSettings": "網路設定",
-	"settings.systemSettings.networkSettings.proxy": "系統代理",
-	"settings.chatSettings.thinkingBudgetTokens": "思考預算 Token 數",
-	"settings.chatSettings.thinkingBudgetTokens.tip":
-		'對於如 Claude 模型的推理模式，思考預算決定其內部推理過程的最大 Token 數。注意，思考預算 Token 數不能小於"最大 Token 數"，所以如果該值有效，"最大 Token 數字"可能由伺服器決定',
+
 	"about.title": "Snow Shot",
 	"about.subtitle": "以簡潔優雅作為理念設計的工具軟體 ❄️",
 	"about.version": "版本",

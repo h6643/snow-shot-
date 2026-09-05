@@ -17,7 +17,6 @@ import {
 	Form,
 	Row,
 	type SelectProps,
-	Slider,
 	Space,
 	Spin,
 	Switch,
@@ -32,7 +31,6 @@ import { ContentWrap } from "@/components/contentWrap";
 import { GroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -65,10 +63,6 @@ export const SystemSettingsPage = () => {
 	// const [renderForm] = Form.useForm<AppSettingsData[AppSettingsGroup.Render]>();
 	const [scrollScreenshotForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.SystemScrollScreenshot]>();
-	const [chatForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.SystemChat]>();
-	const [networkForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.SystemNetwork]>();
 	const [screenshotForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.SystemScreenshot]>();
 
@@ -91,22 +85,6 @@ export const SystemSettingsPage = () => {
 						settings[AppSettingsGroup.SystemCommon]
 				) {
 					commonForm.setFieldsValue(settings[AppSettingsGroup.SystemCommon]);
-				}
-
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.SystemChat] !==
-						settings[AppSettingsGroup.SystemChat]
-				) {
-					chatForm.setFieldsValue(settings[AppSettingsGroup.SystemChat]);
-				}
-
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.SystemNetwork] !==
-						settings[AppSettingsGroup.SystemNetwork]
-				) {
-					networkForm.setFieldsValue(settings[AppSettingsGroup.SystemNetwork]);
 				}
 
 				if (
@@ -137,14 +115,7 @@ export const SystemSettingsPage = () => {
 					coreForm.setFieldsValue(settings[AppSettingsGroup.SystemCore]);
 				}
 			},
-			[
-				commonForm,
-				chatForm,
-				networkForm,
-				scrollScreenshotForm,
-				screenshotForm,
-				coreForm,
-			],
+			[commonForm, scrollScreenshotForm, screenshotForm, coreForm],
 		),
 		true,
 	);
@@ -512,7 +483,7 @@ export const SystemSettingsPage = () => {
 						</Col>
 					</Row>
 
-					{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
+					{
 						<Row gutter={token.marginLG}>
 							<Col span={12}>
 								<ProFormSwitch
@@ -562,7 +533,7 @@ export const SystemSettingsPage = () => {
 								/>
 							</Col>
 						</Row>
-					)}
+					}
 					<Row gutter={token.marginLG}>
 						{currentPlatform === "windows" && (
 							<Col span={12}>
@@ -622,52 +593,6 @@ export const SystemSettingsPage = () => {
             </Spin>
 
             <Divider /> */}
-
-			<GroupTitle
-				id="networkSettings"
-				extra={
-					<ResetSettingsButton
-						title={
-							<FormattedMessage id="settings.systemSettings.networkSettings" />
-						}
-						appSettingsGroup={AppSettingsGroup.SystemNetwork}
-					/>
-				}
-			>
-				<FormattedMessage id="settings.systemSettings.networkSettings" />
-			</GroupTitle>
-
-			<Spin spinning={appSettingsLoading}>
-				<ProForm
-					form={networkForm}
-					onValuesChange={(_, values) => {
-						updateAppSettings(
-							AppSettingsGroup.SystemNetwork,
-							values,
-							true,
-							true,
-							false,
-							true,
-						);
-					}}
-					submitter={false}
-					layout="horizontal"
-				>
-					<ProForm.Item
-						label={
-							<IconLabel
-								label={
-									<FormattedMessage id="settings.systemSettings.networkSettings.proxy" />
-								}
-							/>
-						}
-						name="enableProxy"
-						valuePropName="checked"
-					>
-						<Switch />
-					</ProForm.Item>
-				</ProForm>
-			</Spin>
 
 			<Divider />
 
@@ -836,111 +761,6 @@ export const SystemSettingsPage = () => {
 							/>
 						</Col>
 					</Row>
-				</ProForm>
-			</Spin>
-
-			<Divider />
-
-			<GroupTitle
-				id="chatSettings"
-				extra={
-					<ResetSettingsButton
-						title={
-							<FormattedMessage id="settings.chatSettings" key="chatSettings" />
-						}
-						appSettingsGroup={AppSettingsGroup.SystemChat}
-					/>
-				}
-			>
-				<FormattedMessage id="settings.chatSettings" />
-			</GroupTitle>
-
-			<Spin spinning={appSettingsLoading}>
-				<ProForm
-					form={chatForm}
-					onValuesChange={(_, values) => {
-						updateAppSettings(
-							AppSettingsGroup.SystemChat,
-							values,
-							true,
-							true,
-							false,
-							true,
-						);
-					}}
-					submitter={false}
-				>
-					<ProForm.Item
-						key="maxTokens"
-						label={
-							<IconLabel
-								label={
-									<FormattedMessage id="settings.chatSettings.maxTokens" />
-								}
-								tooltipTitle={
-									<FormattedMessage id="settings.chatSettings.maxTokens.tip" />
-								}
-							/>
-						}
-						name="maxTokens"
-					>
-						<Slider
-							min={512}
-							max={8192}
-							step={128}
-							marks={{
-								512: "512",
-								4096: "4096",
-								8192: "8192",
-							}}
-						/>
-					</ProForm.Item>
-
-					<ProFormSlider
-						key="temperature"
-						label={
-							<IconLabel
-								label={
-									<FormattedMessage id="settings.chatSettings.temperature" />
-								}
-								tooltipTitle={
-									<FormattedMessage id="settings.chatSettings.temperature.tip" />
-								}
-							/>
-						}
-						name="temperature"
-						min={0}
-						max={2}
-						step={0.1}
-						marks={{
-							0: "0",
-							1: "1",
-							2: "2",
-						}}
-					/>
-
-					<ProFormSlider
-						key="thinkingBudgetTokens"
-						label={
-							<IconLabel
-								label={
-									<FormattedMessage id="settings.chatSettings.thinkingBudgetTokens" />
-								}
-								tooltipTitle={
-									<FormattedMessage id="settings.chatSettings.thinkingBudgetTokens.tip" />
-								}
-							/>
-						}
-						name="thinkingBudgetTokens"
-						min={1024}
-						max={8192}
-						step={128}
-						marks={{
-							1024: "1024",
-							4096: "4096",
-							8192: "8192",
-						}}
-					/>
 				</ProForm>
 			</Spin>
 

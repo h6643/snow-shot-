@@ -1,6 +1,5 @@
 import {
 	AppstoreOutlined,
-	InfoCircleOutlined,
 	SettingOutlined,
 	ToolOutlined,
 } from "@ant-design/icons";
@@ -19,11 +18,7 @@ import {
 	TrayIconLoader,
 	TrayIconStatePublisher,
 } from "@/components/trayIconLoader";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -131,30 +126,14 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 						label: intl.formatMessage({ id: "home.screenshotFunction" }),
 					},
 					{
-						key: "chatFunction",
-						label: intl.formatMessage({ id: "home.chatFunction" }),
-					},
-					{
 						key: "translationFunction",
 						label: intl.formatMessage({ id: "home.translationFunction" }),
-					},
-					{
-						key: "videoRecordFunction",
-						label: intl.formatMessage({ id: "home.videoRecordFunction" }),
 					},
 					{
 						key: "otherFunction",
 						label: intl.formatMessage({ id: "home.otherFunction" }),
 					},
 				].filter((item) => {
-					if (item.key === "videoRecordFunction") {
-						return isReadyStatus?.(PLUGIN_ID_FFMPEG);
-					}
-
-					if (item.key === "chatFunction") {
-						return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-					}
-
 					if (item.key === "translationFunction") {
 						return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 					}
@@ -182,18 +161,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 						],
 					},
 					{
-						key: "/tools/chat",
-						path: "/tools/chat",
-						label: intl.formatMessage({ id: "menu.tools.chat" }),
-						hideTabs: true,
-						tabs: [
-							{
-								key: "chat",
-								label: intl.formatMessage({ id: "menu.tools.chat" }),
-							},
-						],
-					},
-					{
 						key: "/tools/captureHistory",
 						path: "/tools/captureHistory",
 						label: intl.formatMessage({ id: "menu.tools.captureHistory" }),
@@ -206,10 +173,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 						],
 					},
 				].filter((item) => {
-					if (item.key === "/tools/chat") {
-						return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-					}
-
 					if (item.key === "/tools/translation") {
 						return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 					}
@@ -328,21 +291,9 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								}),
 							},
 							{
-								key: "chatSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.chatSettings",
-								}),
-							},
-							{
 								key: "fullScreenDrawSettings",
 								label: intl.formatMessage({
 									id: "settings.functionSettings.fullScreenDrawSettings",
-								}),
-							},
-							{
-								key: "videoRecordSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.videoRecordSettings",
 								}),
 							},
 							{
@@ -364,54 +315,7 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								}),
 							},
 						].filter((item) => {
-							if (item.key === "videoRecordSettings") {
-								return isReadyStatus?.(PLUGIN_ID_FFMPEG);
-							}
-
 							if (item.key === "translationSettings") {
-								return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
-							}
-
-							if (item.key === "chatSettings") {
-								return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-							}
-
-							return true;
-						}),
-					},
-					{
-						key: "/settings/hotKeySettings",
-						path: "/settings/hotKeySettings",
-						label: intl.formatMessage({ id: "menu.settings.hotKeySettings" }),
-						tabs: [
-							{
-								key: "translation",
-								label: intl.formatMessage({
-									id: "settings.hotKeySettings.translation",
-								}),
-							},
-							{
-								key: "chat",
-								label: intl.formatMessage({
-									id: "settings.hotKeySettings.chat",
-								}),
-							},
-							{
-								key: "fixedContent",
-								label: intl.formatMessage({
-									id: "settings.hotKeySettings.fixedContent",
-								}),
-							},
-							{
-								key: "drawingHotKey",
-								label: intl.formatMessage({ id: "settings.drawingHotKey" }),
-							},
-						].filter((item) => {
-							if (item.key === "chat") {
-								return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-							}
-
-							if (item.key === "translation") {
 								return isReadyStatus?.(PLUGIN_ID_TRANSLATE);
 							}
 
@@ -445,20 +349,10 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								}),
 							},
 							{
-								key: "networkSettings",
-								label: intl.formatMessage({
-									id: "settings.systemSettings.networkSettings",
-								}),
-							},
-							{
 								key: "scrollScreenshotSettings",
 								label: intl.formatMessage({
 									id: "settings.systemSettings.scrollScreenshotSettings",
 								}),
-							},
-							{
-								key: "chatSettings",
-								label: intl.formatMessage({ id: "settings.chatSettings" }),
 							},
 							{
 								key: "coreSettings",
@@ -473,26 +367,10 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 								}),
 							},
 						].filter(() => {
-							// if (item.key === 'chatSettings') {
-							//     return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
-							// }
-
 							return true;
 						}),
 					},
 				],
-			},
-			{
-				key: "/about",
-				path: "/about",
-				tabs: [
-					{
-						key: "snowShot",
-						label: intl.formatMessage({ id: "home.snowShot" }),
-					},
-				],
-				label: intl.formatMessage({ id: "menu.about" }),
-				icon: <InfoCircleOutlined />,
 			},
 		];
 

@@ -1296,10 +1296,7 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 					return;
 				}
 
-				if (
-					drawState === DrawState.ScrollScreenshot ||
-					drawState === DrawState.ScanQrcode
-				) {
+				if (drawState === DrawState.ScrollScreenshot) {
 					drawCanvasSelectRect(selectRect, drawState, undefined);
 				} else if (prevDrawState === DrawState.ScrollScreenshot) {
 					drawCanvasSelectRect(selectRect);

@@ -52,7 +52,18 @@ export default defineConfig({
 					autoCodeSplitting: true,
 				}),
 			],
-			optimization: {},
+			optimization: {
+				splitChunks: {
+					cacheGroups: {
+						browserFsAccess: {
+							test: /[\\/]node_modules[\\/]browser-fs-access[\\/]/,
+							name: "browser-fs-access",
+							chunks: "all",
+							priority: 100,
+						},
+					},
+				},
+			},
 		},
 	},
 });
