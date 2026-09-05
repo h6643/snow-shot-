@@ -1042,11 +1042,14 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
                 .draw-toolbar {
                     padding: ${token.paddingXXS}px ${token.paddingSM}px;
                     box-sizing: border-box;
-                    background-color: ${token.colorBgContainer};
-                    border-radius: ${token.borderRadiusLG}px;
+                    background-color: ${token.colorBgContainer}E6;
+                    backdrop-filter: blur(12px) saturate(180%);
+                    -webkit-backdrop-filter: blur(12px) saturate(180%);
+                    border: 1px solid ${token.colorBorderSecondary};
+                    border-radius: ${token.borderRadiusLG + 2}px;
                     cursor: default; /* 防止非拖动区域也变成可拖动状态 */
                     color: ${token.colorText};
-                    box-shadow: 0 0 3px 0px ${token.colorPrimaryHover};
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
                     transition: opacity ${token.motionDurationMid} ${token.motionEaseInOut};
                     z-index: ${zIndexs.Draw_Toolbar};
                 }
@@ -1090,6 +1093,10 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
                     height: 0.83em;
                     background-color: ${token.colorBorder};
                     margin: 0 ${token.marginXXS}px;
+                }
+
+                .draw-toolbar-container :global(.ant-btn) {
+                    border-radius: ${token.borderRadius}px;
                 }
             `}</style>
 		</div>

@@ -30,8 +30,8 @@ import { defaultDrawToolbarKeyEventSettings } from "./drawToolbarKeyEvent";
 export const defaultAppSettingsData: AppSettingsData = {
 	[AppSettingsGroup.Common]: {
 		theme: AppSettingsTheme.System,
-		mainColor: "#1677FF",
-		borderRadius: 6,
+		mainColor: "#3388ff",
+		borderRadius: 8,
 		enableCompactLayout: false,
 		language: AppSettingsLanguage.ZHHans,
 		browserLanguage: "",
