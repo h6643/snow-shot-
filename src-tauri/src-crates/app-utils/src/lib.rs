@@ -509,16 +509,15 @@ pub fn capture_target_monitor(
         };
 
         let image = if let Some(crop_area) = crop_area {
-            imageops::crop(
-                &mut image,
+            let (cx, cy, cw, ch) = (
                 crop_area.min_x.max(0) as u32,
                 crop_area.min_y.max(0) as u32,
                 (crop_area.max_x - crop_area.min_x).max(0) as u32,
                 (crop_area.max_y - crop_area.min_y).max(0) as u32,
-            )
-            .clone()
+            );
+            imageops::crop_mut(&mut image, cx, cy, cw, ch).to_image().to_rgba8()
         } else {
-            image
+            image.to_rgba8()
         };
 
         return Some(match color_format {
@@ -960,6 +959,13 @@ pub async fn set_exclude_from_capture(
             ));
         }
 
+        Ok(())
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        // Linux X11/Wayland doesn't have WDA_EXCLUDEFROMCAPTURE equivalent
+        // Exclude-window capture is not supported on Linux
         Ok(())
     }
 }

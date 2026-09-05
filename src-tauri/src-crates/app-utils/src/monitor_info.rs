@@ -89,6 +89,23 @@ impl MonitorInfo {
                 monitor_scale_factor,
             }
         }
+
+        #[cfg(target_os = "linux")]
+        {
+            monitor_rect = ElementRect {
+                min_x: monitor.x().unwrap_or(0),
+                min_y: monitor.y().unwrap_or(0),
+                max_x: monitor.x().unwrap_or(0) + monitor.width().unwrap_or(0) as i32,
+                max_y: monitor.y().unwrap_or(0) + monitor.height().unwrap_or(0) as i32,
+            };
+            scale_factor = monitor.scale_factor().unwrap_or(1.0);
+
+            MonitorInfo {
+                monitor: monitor.clone(),
+                rect: monitor_rect,
+                scale_factor,
+            }
+        }
     }
 
     pub fn get_monitor_crop_region(&self, crop_region: ElementRect) -> ElementRect {
@@ -211,6 +228,16 @@ impl MonitorInfo {
                 ),
             };
         }
+
+        #[cfg(target_os = "linux")]
+        {
+            return super::capture_target_monitor(
+                &self.monitor,
+                crop_area,
+                exclude_window,
+                capture_option.color_format,
+            );
+        }
     }
 }
 
@@ -280,6 +307,11 @@ impl MonitorList {
                 }
 
                 #[cfg(target_os = "macos")]
+                {
+                    MonitorInfo::new(monitor)
+                }
+
+                #[cfg(target_os = "linux")]
                 {
                     MonitorInfo::new(monitor)
                 }
@@ -803,6 +835,11 @@ impl MonitorList {
             }
 
             #[cfg(target_os = "macos")]
+            {
+                false
+            }
+
+            #[cfg(target_os = "linux")]
             {
                 false
             }
