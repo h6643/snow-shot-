@@ -36,7 +36,8 @@
 			"icons/icon.ico"
 		],
 		"resources": {
-			"app-icons/": "app-icons/"
+			"app-icons/": "app-icons/",
+			"resources/ocr-models/": "resources/ocr-models/"
 		}
 	}
 }
