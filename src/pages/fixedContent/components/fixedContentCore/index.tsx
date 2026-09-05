@@ -1,4 +1,4 @@
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { CloseOutlined, EditOutlined, CopyOutlined, SaveOutlined, PushpinOutlined, EyeOutlined, SlidersOutlined, FullscreenOutlined, SwitcherOutlined } from "@ant-design/icons";
 import type { ExcalidrawElement } from "@mg-chao/excalidraw/element/types";
 import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import { Menu, type MenuItemOptions, Submenu } from "@tauri-apps/api/menu";
@@ -48,6 +48,7 @@ import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import { useTempInfo } from "@/hooks/useTempInfo";
 import { useTextScaleFactor } from "@/hooks/useTextScaleFactor";
 import { copyToClipboard as copyToClipboardDrawAction } from "@/pages/draw/actions";
+import { createFullScreenDrawWindow } from "@/commands/core";
 import type { SelectRectParams } from "@/pages/draw/components/selectLayer";
 import {
 	type CaptureBoundingBoxInfo,
@@ -2579,6 +2580,24 @@ const FixedContentCoreInner: React.FC<{
 						pointerEvents: "auto",
 					}}
 				>
+					{/* 固定到屏幕 - 重新打开截图编辑 */}
+					<Button
+						icon={<PushpinOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-fixed-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="固定到屏幕"
+						onClick={() => {
+							createFullScreenDrawWindow();
+						}}
+					/>
+
+					{/* 绘制模式 */}
 					<Button
 						icon={<EditOutlined />}
 						style={{
@@ -2589,11 +2608,115 @@ const FixedContentCoreInner: React.FC<{
 						type="primary"
 						shape="circle"
 						variant="solid"
+						title="绘制模式"
 						onClick={() => {
 							switchDraw();
 						}}
 					/>
 
+					{/* 缩略模式 */}
+					<Button
+						icon={<FullscreenOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-thumbnail-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="缩略模式"
+						onClick={() => {
+							switchThumbnail();
+						}}
+					/>
+
+					{/* 置顶窗口 */}
+					<Button
+						icon={<PushpinOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-pint-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="置顶/取消置顶"
+						onClick={() => {
+							switchAlwaysOnTop();
+						}}
+					/>
+
+					{/* 复制到剪贴板 */}
+					<Button
+						icon={<CopyOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-copy-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="复制到剪贴板"
+						onClick={() => {
+							copyToClipboard();
+						}}
+					/>
+
+					{/* 保存为文件 */}
+					<Button
+						icon={<SaveOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-save-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="保存为文件"
+						onClick={() => {
+							saveToFile();
+						}}
+					/>
+
+					{/* 选取文本/拖拽窗口 */}
+					<Button
+						icon={<SwitcherOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-select-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="选取文本/拖拽窗口"
+						onClick={() => {
+							switchSelectText();
+						}}
+					/>
+
+					{/* 设置透明度 */}
+					<Button
+						icon={<SlidersOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-opacity-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						title="设置透明度"
+						onClick={() => {
+							changeContentOpacity(contentOpacity === 1 ? 0.5 : 1);
+						}}
+					/>
+
+					{/* 关闭窗口 */}
 					<Button
 						icon={<CloseOutlined />}
 						style={{
@@ -2604,6 +2727,7 @@ const FixedContentCoreInner: React.FC<{
 						type="primary"
 						shape="circle"
 						variant="solid"
+						title="关闭窗口"
 						onClick={() => {
 							closeWindowComplete();
 						}}
@@ -2641,7 +2765,14 @@ const FixedContentCoreInner: React.FC<{
 
                 
                 :global(.fixed-image-container .fixed-image-button-group .fixed-image-edit-button):hover,
-                :global(.fixed-image-container .fixed-image-button-group .fixed-image-translation-button):hover {
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-translation-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-fixed-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-thumbnail-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-pint-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-copy-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-save-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-select-button):hover,
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-opacity-button):hover {
                     background-color: ${token.colorPrimary} !important;
                 }
 
