@@ -35,14 +35,14 @@ jobs:
                   fi
               shell: bash
 
-            # 手动触发时创建 tag
+            # 手动触发时创建 tag（已存在则覆盖，支持同一版本重跑）
             - name: Create tag (if manual trigger)
               if: github.event_name == 'workflow_dispatch'
               run: |
                   git config user.name github-actions
                   git config user.email github-actions@github.com
-                  git tag -a ${{ steps.vars.outputs.tag }} -m "Release ${{ steps.vars.outputs.tag }}"
-                  git push origin ${{ steps.vars.outputs.tag }}
+                  git tag -a ${{ steps.vars.outputs.tag }} -m "Release ${{ steps.vars.outputs.tag }}" --force
+                  git push origin ${{ steps.vars.outputs.tag }} --force
             # 安装 Node.js
             - name: Setup node
               uses: actions/setup-node@v4
@@ -201,7 +201,12 @@ jobs:
                     libxdo-dev \
                     libssl-dev \
                     libayatana-appindicator3-dev \
-                    librsvg2-dev
+                    librsvg2-dev \
+                    libpipewire-0.3-dev \
+                    libasound2-dev \
+                    libdbus-1-dev \
+                    libudev-dev \
+                    libclang-dev
 
             # 下载并配置 onnxruntime (macOS only)
             - name: Download and setup onnxruntime (macOS)
