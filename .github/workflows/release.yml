@@ -108,7 +108,7 @@ jobs:
             - name: Setup pnpm
               uses: pnpm/action-setup@v3
               with:
-                  version: latest
+                  version: 10.8.1
 
             # 安装 Rust
             - name: Install Rust stable
