@@ -76,15 +76,14 @@ jobs:
                     - platform: "windows-latest"
                       target: "x86_64-pc-windows-msvc"
 
-                    # Windows with fixed runtime
-                    - platform: "windows-latest"
-                      target: "x86_64-pc-windows-msvc"
-                      fixedRuntime: true
-
                     # Windows offline version
                     - platform: "windows-latest"
                       target: "x86_64-pc-windows-msvc"
                       offline: true
+
+                    # Linux x64
+                    - platform: "ubuntu-22.04"
+                      target: "x86_64-unknown-linux-gnu"
 
         runs-on: ${{ matrix.platform }}
         steps:
@@ -188,39 +187,21 @@ jobs:
                   Remove-Item -Path "onnxruntime-temp" -Recurse -Force
               shell: pwsh
 
-            # 下载并配置 WebView2 Fixed Runtime (Windows fixedRuntime only)
-            - name: Download and setup WebView2 Fixed Runtime
-              if: matrix.platform == 'windows-latest' && matrix.fixedRuntime == true
+            # Linux 专用：安装系统依赖
+            - name: Install Linux dependencies
+              if: runner.os == 'Linux'
               run: |
-                  # 下载 WebView2 Fixed Runtime v141.0.3537.99
-                  $runtimeVersion = "141.0.3537.99"
-                  $cabUrl = "https://github.com/mg-chao/snow-shot-webview-runtime/releases/download/v141.0.3537.99/Microsoft.WebView2.FixedVersionRuntime.141.0.3537.99.x64.cab"
-                  $cabFile = "Microsoft.WebView2.FixedVersionRuntime.$runtimeVersion.x64.cab"
-
-                  Write-Host "Downloading WebView2 Fixed Runtime $runtimeVersion..."
-                  Invoke-WebRequest -Uri $cabUrl -OutFile $cabFile
-
-                  # 解压 cab 文件到 src-tauri 目录
-                  Write-Host "Extracting WebView2 Fixed Runtime..."
-                  $targetDir = ".\src-tauri\Microsoft.WebView2.FixedVersionRuntime.$runtimeVersion.x64"
-
-                  # 创建目标目录
-                  New-Item -Path $targetDir -ItemType Directory -Force | Out-Null
-
-                  # 使用 expand 命令解压
-                  Expand -F:* $cabFile $targetDir
-
-                  Write-Host "Successfully extracted WebView2 Fixed Runtime to $targetDir"
-
-                  # 清理临时文件
-                  Remove-Item -Path $cabFile -Force
-
-                  # 移除原有的 tauri.windows.conf.json 并使用 webview2.x64.json
-                  Write-Host "Replacing tauri.windows.conf.json with webview2.x64.json..."
-                  Remove-Item -Path ".\src-tauri\tauri.windows.conf.json" -Force -ErrorAction SilentlyContinue
-                  Move-Item -Path ".\src-tauri\webview2.x64.json" -Destination ".\src-tauri\tauri.windows.conf.json" -Force
-                  Write-Host "Configuration files updated successfully"
-              shell: pwsh
+                  sudo apt-get update
+                  sudo apt-get install -y \
+                    libwebkit2gtk-4.1-dev \
+                    build-essential \
+                    curl \
+                    wget \
+                    file \
+                    libxdo-dev \
+                    libssl-dev \
+                    libayatana-appindicator3-dev \
+                    librsvg2-dev
 
             # 下载并配置 onnxruntime (macOS only)
             - name: Download and setup onnxruntime (macOS)
@@ -267,9 +248,7 @@ jobs:
             - name: Set asset name pattern
               id: asset_pattern
               run: |
-                  if [ "${{ matrix.fixedRuntime }}" = "true" ]; then
-                    echo "pattern=Snow Shot_[version]_[platform]-[arch]_webview[_setup][ext]" >> $GITHUB_OUTPUT
-                  elif [ "${{ matrix.offline }}" = "true" ]; then
+                  if [ "${{ matrix.offline }}" = "true" ]; then
                     echo "pattern=Snow Shot_[version]_[platform]-[arch]_offline[_setup][ext]" >> $GITHUB_OUTPUT
                   else
                     echo "pattern=Snow Shot_[version]_[platform]-[arch][_setup][ext]" >> $GITHUB_OUTPUT
@@ -314,9 +293,10 @@ jobs:
             - name: Generate Release Notes
               run: |
                   cat > release_notes.md << EOF
-                  ## ⚠️ Windows 用户注意
+                  ## 下载说明
 
-                  由于 Windows 系统更新导致应用渲染性能下降，建议暂时使用 **WebView2 内置版**以获得更好的使用体验。
+                  - **Windows**：标准版（使用系统 WebView2）/ 离线版（内置 OCR 模型，安装后无需联网下载）
+                  - **Linux**：deb / AppImage 包（首次打包，如遇问题请提 issue）
 
                   EOF
 
