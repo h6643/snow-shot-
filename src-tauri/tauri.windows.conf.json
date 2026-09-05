@@ -1,19 +1,9 @@
 {
 	"$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
 	"identifier": "com.chao.snowshot",
-	"plugins": {
-		"updater": {
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVGODlCOTdFOUU2RjZDMQpSV1RCOXVicGw1djRCZE4waUVoR2lCU2xxYWlvMUhDUTFTR2VXZmFyWmVZMXBxRy9vV1BHQXBBdwo=",
-			"endpoints": [
-				"https://github.com/mg-chao/snow-shot/releases/latest/download/latest.json"
-			],
-			"windows": {
-				"installMode": "passive"
-			}
-		}
-	},
+	"plugins": {},
 	"bundle": {
-		"createUpdaterArtifacts": true,
+		"createUpdaterArtifacts": false,
 		"active": true,
 		"category": "Utility",
 		"shortDescription": "Snow Shot",
