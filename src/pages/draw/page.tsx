@@ -56,6 +56,7 @@ import {
 import { sendErrorMessage } from "@/functions/sendMessage";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
+import { useHotkeysApp } from "@/hooks/useHotkeysApp";
 import { AppSettingsGroup, DoubleClickAction } from "@/types/appSettings";
 import {
 	type ElementRect,
@@ -1317,6 +1318,30 @@ const DrawPageCore: React.FC<{
 			document.removeEventListener("mousemove", handleMouseMove);
 		};
 	}, []);
+
+	useEffect(() => {
+		// Ctrl+C 快捷键直接复制到剪贴板
+		const handleCopy = (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.key === 'c') {
+				e.preventDefault();
+				// 如果在 OCR 模式，复制 OCR 结果
+				if (isOcrTool(getDrawState())) {
+					const ocrResult = ocrBlocksActionRef.current?.getOcrResultAction()?.getOcrResult();
+					if (ocrResult) {
+						writeTextToClipboard(covertOcrResultToText(ocrResult.result));
+					}
+					return;
+				}
+				// 否则复制图像到剪贴板
+				onCopyToClipboard();
+			}
+		};
+
+		document.addEventListener('keydown', handleCopy);
+		return () => {
+			document.removeEventListener('keydown', handleCopy);
+		};
+	}, [getDrawState, onCopyToClipboard]);
 
 	useEffect(() => {
 		document.oncopy = () => {

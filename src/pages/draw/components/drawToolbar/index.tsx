@@ -600,7 +600,8 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 			if (canHandleScreenshotTypeRef.current) {
 				switch (getScreenshotType()?.type) {
 					case ScreenshotType.Fixed:
-						onFixed();
+						// Fixed类型不再自动贴图，保持图像在画布中
+						// 用户需要手动按快捷键或点击"固定到屏幕"按钮
 						break;
 					case ScreenshotType.OcrDetect:
 						onToolClick(DrawState.OcrDetect);
