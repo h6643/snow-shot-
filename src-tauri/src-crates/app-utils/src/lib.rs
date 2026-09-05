@@ -227,6 +227,11 @@ pub fn get_capture_monitor_list(
         }
     }
 
+    #[cfg(target_os = "linux")]
+    {
+        support_multiple_monitor = true;
+    }
+
     if enable_multiple_monitor && support_multiple_monitor {
         Ok(MonitorList::all(ignore_sdr_info))
     } else {
@@ -490,6 +495,33 @@ pub fn capture_target_monitor(
                 }
             }
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let image = match monitor.capture_image() {
+            Ok(image) => image,
+            Err(e) => {
+                log::error!("[capture_target_monitor] failed to capture image: {:?}", e);
+                return None;
+            }
+        };
+
+        let image = if let Some(crop_area) = crop_area {
+            image.crop_imm(
+                crop_area.min_x.max(0) as u32,
+                crop_area.min_y.max(0) as u32,
+                (crop_area.max_x - crop_area.min_x).max(0) as u32,
+                (crop_area.max_y - crop_area.min_y).max(0) as u32,
+            )
+        } else {
+            image
+        };
+
+        return Some(match color_format {
+            ColorFormat::Rgb8 => DynamicImage::ImageRgb8(image.to_rgb8()),
+            ColorFormat::Rgba8 => DynamicImage::ImageRgba8(image.to_rgba8()),
+        });
     }
 }
 
