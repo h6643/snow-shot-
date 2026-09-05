@@ -91,7 +91,7 @@ jobs:
                     MATRIX+='{"platform":"windows-latest","target":"x86_64-pc-windows-msvc"},'
                   fi
                   if [ "$BUILD_LINUX" = "true" ]; then
-                    MATRIX+='{"platform":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu"},'
+                    MATRIX+='{"platform":"ubuntu-24.04","target":"x86_64-unknown-linux-gnu"},'
                   fi
                   MATRIX=$(echo "$MATRIX" | sed 's/,$//')
                   MATRIX+=']'
