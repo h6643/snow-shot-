@@ -11,6 +11,7 @@ use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::codecs::webp::WebPEncoder;
 use image::{DynamicImage, GenericImageView};
+use image::imageops;
 use snow_shot_app_shared::ElementRect;
 use tauri::AppHandle;
 use xcap::Monitor;
@@ -508,12 +509,14 @@ pub fn capture_target_monitor(
         };
 
         let image = if let Some(crop_area) = crop_area {
-            image.crop_imm(
+            imageops::crop(
+                &mut image,
                 crop_area.min_x.max(0) as u32,
                 crop_area.min_y.max(0) as u32,
                 (crop_area.max_x - crop_area.min_x).max(0) as u32,
                 (crop_area.max_y - crop_area.min_y).max(0) as u32,
             )
+            .clone()
         } else {
             image
         };
