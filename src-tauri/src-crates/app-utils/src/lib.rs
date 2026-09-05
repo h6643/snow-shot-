@@ -523,7 +523,7 @@ pub fn capture_target_monitor(
 
         return Some(match color_format {
             ColorFormat::Rgb8 => DynamicImage::ImageRgb8(image.to_rgb8()),
-            ColorFormat::Rgba8 => DynamicImage::ImageRgba8(image.to_rgba8()),
+            ColorFormat::Rgba8 => DynamicImage::ImageRgba8(image),
         });
     }
 }
