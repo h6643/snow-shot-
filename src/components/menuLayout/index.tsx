@@ -25,7 +25,6 @@ import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { zhHans } from "@/messages/zhHans";
 import {
 	AppSettingsGroup,
-	AppSettingsLanguage,
 	AppSettingsTheme,
 } from "@/types/appSettings";
 import type { RouteItem, RouteMapItem } from "@/types/components/menuLayout";
@@ -56,27 +55,9 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 	useAppSettingsLoad(
 		useCallback(
 			(settings) => {
-				// 获取浏览器语言，判断是否需要切换语言
-				const settingBrowserLanguage =
-					settings[AppSettingsGroup.Common].browserLanguage;
-				const browserLanguage = navigator.language;
-				if (settingBrowserLanguage !== browserLanguage) {
-					// 切换语言
-					const language = AppSettingsLanguage.ZHHans;
-
-					updateAppSettings(
-						AppSettingsGroup.Common,
-						{
-							browserLanguage: browserLanguage,
-							language,
-						},
-						false,
-						true,
-						true,
-					);
-				}
+				// ...
 			},
-			[updateAppSettings],
+			[],
 		),
 	);
 

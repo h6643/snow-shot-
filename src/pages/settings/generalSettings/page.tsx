@@ -22,7 +22,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ContentWrap } from "@/components/contentWrap";
 import { GroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
-import { DarkModeIcon, LanguageIcon } from "@/components/icons";
+import { DarkModeIcon } from "@/components/icons";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -31,7 +31,6 @@ import {
 	AppSettingsControlNode,
 	type AppSettingsData,
 	AppSettingsGroup,
-	AppSettingsLanguage,
 	AppSettingsTheme,
 	ColorPickerShowMode,
 } from "@/types/appSettings";
@@ -226,24 +225,6 @@ export const GeneralSettingsPage = () => {
 								<Select options={themeOptions} />
 							</Form.Item>
 						</Col>
-						<Col span={12}>
-							<Form.Item
-								className="settings-wrap-language"
-								name="language"
-								label={
-									<IconLabel
-										icon={<LanguageIcon />}
-										label={<FormattedMessage id="settings.language" />}
-									/>
-								}
-								required={false}
-								rules={[{ required: true }]}
-							>
-								<Select>
-									<Option value={AppSettingsLanguage.ZHHans}>简体中文</Option>
-								</Select>
-							</Form.Item>
-						</Col>
 					</Row>
 				</Spin>
 			</Form>
@@ -339,7 +320,6 @@ export const GeneralSettingsPage = () => {
 
 						<Col span={12}>
 							<ProForm.Item
-								className="settings-wrap-language"
 								name="controlNode"
 								label={
 									<IconLabel
@@ -627,15 +607,6 @@ export const GeneralSettingsPage = () => {
 					</Row>
 				</Spin>
 			</ProForm>
-
-			<style jsx>{`
-                :global(.settings-form)
-                    :global(.settings-wrap-language)
-                    :global(.ant-form-item-control) {
-                    flex-grow: unset !important;
-                    min-width: 128px;
-                }
-            `}</style>
 		</ContentWrap>
 	);
 };
