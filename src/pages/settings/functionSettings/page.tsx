@@ -22,6 +22,7 @@ import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
+import { usePlatform } from "@/hooks/usePlatform";
 import {
 	type AppSettingsData,
 	AppSettingsGroup,
@@ -29,8 +30,12 @@ import {
 	OcrModel,
 } from "@/types/appSettings";
 import { DrawState } from "@/types/draw";
+import { generateImageFileName, getImageSaveDirectory } from "@/utils/file";
+
+export const FunctionSettingsPage = () => {
 	const intl = useIntl();
 	const { token } = theme.useToken();
+	const [platform] = usePlatform();
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
 	const [functionDrawForm] =
