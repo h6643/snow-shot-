@@ -4,7 +4,6 @@ pub mod global_state;
 pub mod hot_load_page;
 pub mod listen_key;
 pub mod ocr;
-pub mod plugin;
 pub mod screenshot;
 pub mod scroll_screenshot;
 pub mod video_record;
@@ -31,7 +30,6 @@ use snow_shot_app_services::resize_window_service;
 use snow_shot_app_services::video_record_service;
 use snow_shot_app_shared::EnigoManager;
 use snow_shot_global_state::{CaptureState, ReadClipboardState, WebViewSharedBufferState};
-use snow_shot_plugin_service::plugin_service;
 
 #[cfg(feature = "dhat-heap")]
 pub static PROFILER: std::sync::LazyLock<Mutex<Option<dhat::Profiler>>> =
@@ -66,8 +64,6 @@ pub fn run() {
 
     let enable_run_log = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
     let enable_run_log_clone = enable_run_log.clone();
-
-    let plugin_service = Arc::new(plugin_service::PluginService::new());
 
     let capture_state = Mutex::new(CaptureState { capturing: false });
 
@@ -218,7 +214,6 @@ pub fn run() {
         .manage(listen_mouse_service)
         .manage(file_cache_service)
         .manage(enable_run_log_clone)
-        .manage(plugin_service)
         .manage(full_screen_draw_window_labels)
         .manage(webview_shared_buffer_state)
         .manage(hot_load_page_service)
@@ -310,11 +305,6 @@ pub fn run() {
             file::text_file_write,
             file::text_file_clear,
             file::is_portable_app,
-            plugin::plugin_init,
-            plugin::plugin_get_plugins_status,
-            plugin::plugin_register_plugin,
-            plugin::plugin_install_plugin,
-            plugin::plugin_uninstall_plugin,
             webview::create_webview_shared_buffer,
             webview::set_support_webview_shared_buffer,
             #[cfg(target_os = "windows")]
