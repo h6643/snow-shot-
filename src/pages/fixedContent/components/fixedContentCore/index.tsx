@@ -2,7 +2,6 @@ import {
 	CloseOutlined,
 	CopyOutlined,
 	EditOutlined,
-	EyeOutlined,
 	FullscreenOutlined,
 	PushpinOutlined,
 	SaveOutlined,
@@ -270,9 +269,6 @@ const FixedContentCoreInner: React.FC<{
 	const [currentOcrResult, setCurrentOcrResult] = useState<
 		(AppOcrResult & { ocrResultType: OcrResultType }) | undefined
 	>(undefined);
-	const [ocrResult, setOcrResult] = useState<AppOcrResult | undefined>(
-		undefined,
-	);
 
 	const [textContent, setTextContent, textContentRef] = useStateRef<
 		| {
@@ -1865,7 +1861,6 @@ const FixedContentCoreInner: React.FC<{
 		scaleRef,
 		setscrollAction,
 		applyProcessImageConfigToImageLayerAction,
-		currentOcrResult?.ocrResultType,
 		enableTrayIcon,
 	]);
 
@@ -2390,7 +2385,6 @@ const FixedContentCoreInner: React.FC<{
 							processImageConfig,
 						),
 					}}
-					onOcrResultChange={setOcrResult}
 					onCurrentOcrResultChange={setCurrentOcrResult}
 				/>
 

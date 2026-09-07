@@ -20,7 +20,8 @@ import {
 	OcrModel,
 } from "@/types/appSettings";
 import { DrawState } from "@/types/draw";
-import { generateImageFileName, getImageSaveDirectory } from "@/utils/file";
+import { getImageSaveDirectory } from "@/utils/file";
+
 
 export const FunctionSettingsPage = () => {
 	const intl = useIntl();

@@ -54,7 +54,6 @@ import {
 	releaseDrawPage,
 } from "@/functions/screenshot";
 import { sendErrorMessage } from "@/functions/sendMessage";
-import { useHotkeysApp } from "@/hooks/useHotkeysApp";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import { AppSettingsGroup, DoubleClickAction } from "@/types/appSettings";
@@ -88,10 +87,7 @@ import {
 	type FixedContentActionType,
 	FixedContentCore,
 } from "../fixedContent/components/fixedContentCore";
-import {
-	covertOcrResultToText,
-	OcrResultType,
-} from "../fixedContent/components/ocrResult";
+import { covertOcrResultToText } from "../fixedContent/components/ocrResult";
 import {
 	DrawContext as CommonDrawContext,
 	type DrawContextType as CommonDrawContextType,
@@ -1287,15 +1283,7 @@ const DrawPageCore: React.FC<{
 			removeListener(releaseListenerId);
 			removeListener(ocrDetectListenerId);
 		};
-	}, [
-		addListener,
-		excuteScreenshot,
-		removeListener,
-		finishCapture,
-		onOcrDetect,
-		getCaptureStep,
-		getDrawState,
-	]);
+	}, [addListener, excuteScreenshot, removeListener, finishCapture]);
 
 	// 默认隐藏
 	useEffect(() => {
@@ -1382,7 +1370,7 @@ const DrawPageCore: React.FC<{
 		return () => {
 			document.removeEventListener("keydown", handleCopy);
 		};
-	}, [getDrawState, onCopyToClipboard]);
+	}, [getDrawState, onCopyToClipboard, finishCapture]);
 
 	useEffect(() => {
 		document.oncopy = () => {
