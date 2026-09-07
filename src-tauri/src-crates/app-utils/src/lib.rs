@@ -11,8 +11,6 @@ use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::codecs::webp::WebPEncoder;
 use image::{DynamicImage, GenericImageView};
-#[cfg(target_os = "linux")]
-use image::imageops;
 use snow_shot_app_shared::ElementRect;
 use tauri::AppHandle;
 use xcap::Monitor;
@@ -516,7 +514,7 @@ pub fn capture_target_monitor(
                 (crop_area.max_x - crop_area.min_x).max(0) as u32,
                 (crop_area.max_y - crop_area.min_y).max(0) as u32,
             );
-            imageops::crop_mut(&mut image, cx, cy, cw, ch)
+            image.crop_imm(cx, cy, cw, ch)
         } else {
             image.to_rgba8()
         };
