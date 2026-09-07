@@ -1,6 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ServiceResponse } from "./services/tools";
 
+// 模拟 File System Access API，避免 browser-fs-access 使用 Web Share API
+interface FileSystemHandle {
+	kind: "file" | "directory";
+	name: string;
+}
+
+interface ShowOpenFilePickerOptions {
+	multiple?: boolean;
+	excludeAcceptAllOption?: boolean;
+	startIn?: string;
+	id?: string;
+	types?: Array<{
+		description?: string;
+		accept?: Record<string, string[]>;
+	}>;
+}
+
+interface ShowSaveFilePickerOptions {
+	suggestedName?: string;
+	excludeAcceptAllOption?: boolean;
+	startIn?: string;
+	id?: string;
+	types?: Array<{
+		description?: string;
+		accept?: Record<string, string[]>;
+	}>;
+}
+
 declare global {
 	interface Window {
 		__APP_AUTO_START_HIDE_WINDOW__: boolean;
@@ -30,5 +58,12 @@ declare global {
 				releaseBuffer: (buffer: SharedBuffer) => void;
 			};
 		};
+		// File System Access API polyfill
+		showOpenFilePicker?: (
+			options?: ShowOpenFilePickerOptions,
+		) => Promise<FileSystemHandle[]>;
+		showSaveFilePicker?: (
+			options?: ShowSaveFilePickerOptions,
+		) => Promise<FileSystemHandle>;
 	}
 }

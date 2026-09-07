@@ -18,7 +18,7 @@ import type { ElementRect, ImageBuffer } from "@/types/commands/screenshot";
 import type { CaptureHistoryItem } from "@/utils/appStore";
 import { getCaptureHistoryImageAbsPath } from "@/utils/captureHistory";
 import { supportOffscreenCanvas } from "@/utils/environment";
-import { appWarn } from "@/utils/log";
+import { appError, appWarn } from "@/utils/log";
 import {
 	addImageToContainerAction,
 	applyProcessImageConfigToCanvasAction,
@@ -243,9 +243,15 @@ export const ImageLayer: React.FC<ImageLayerProps> = ({
 	const [hasInitRendererWorker, setHasInitRendererWorker] = useState(false);
 
 	useEffect(() => {
-		const worker = supportOffscreenCanvas()
-			? new Worker(new URL("./workers/renderWorker.ts", import.meta.url))
-			: undefined;
+		let worker: Worker | undefined;
+		try {
+			worker = supportOffscreenCanvas()
+				? new Worker(new URL("./workers/renderWorker.ts", import.meta.url))
+				: undefined;
+		} catch (error) {
+			appError("[ImageLayer] create render worker failed", error);
+		}
+
 		setRendererWorker(worker);
 		setHasInitRendererWorker(true);
 		return () => {
@@ -322,12 +328,32 @@ export const ImageLayer: React.FC<ImageLayerProps> = ({
 				antialias,
 			};
 
-			await initCanvasAction(
-				rendererWorker,
-				canvasAppRef,
-				initOptions,
-				offscreenCanvasRef.current ? [offscreenCanvasRef.current] : undefined,
-			);
+			try {
+				await initCanvasAction(
+					rendererWorker,
+					canvasAppRef,
+					initOptions,
+					offscreenCanvasRef.current ? [offscreenCanvasRef.current] : undefined,
+				);
+			} catch (error) {
+				appError(
+					"[ImageLayer] render worker init failed, fallback to main",
+					error,
+				);
+
+				offscreenCanvasRef.current = undefined;
+				rendererWorker?.terminate();
+				setRendererWorker(undefined);
+				await initCanvasAction(
+					undefined,
+					canvasAppRef,
+					{
+						...initOptions,
+						canvas,
+					},
+					undefined,
+				);
+			}
 
 			await onInitCanvasReady?.();
 		},

@@ -13,7 +13,7 @@ import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
 import { ImageFormat, type ImagePath } from "@/types/utils/file";
 import { writeImageToClipboard } from "@/utils/clipboard";
 import { showImageDialog } from "@/utils/file";
-import { appError } from "@/utils/log";
+import { appError, appInfo, appWarn } from "@/utils/log";
 import { getPlatform } from "@/utils/platform";
 import { randomString } from "@/utils/random";
 import { getWebViewSharedBuffer } from "@/utils/webview";
@@ -41,6 +41,11 @@ const getCanvasCore = async (
 		return;
 	}
 
+	appInfo("[fixedToScreen] select", {
+		rect: selectRectParams.rect,
+		shadowWidth: selectRectParams.shadowWidth,
+	});
+
 	const { rect: selectRect, shadowColor: selectRectShadowColor } =
 		selectRectParams;
 
@@ -61,12 +66,19 @@ const getCanvasCore = async (
 		renderContainerKey,
 	);
 
+	appInfo("[fixedToScreen] imageBitmap", {
+		renderContainerKey,
+		width: imageLayerImageBitmap?.width,
+		height: imageLayerImageBitmap?.height,
+	});
+
 	const drawLayerCanvas =
 		!ignoreDrawLayer && drawElements.length > 0
 			? drawLayerAction.getCanvas()
 			: undefined;
 
 	if (!imageLayerImageBitmap) {
+		appWarn("[fixedToScreen] imageBitmap is undefined");
 		return;
 	}
 
@@ -81,6 +93,7 @@ const getCanvasCore = async (
 	tempCanvas.height = contentHeight + selectRectShadowWidth * 2;
 	const tempCtx = tempCanvas.getContext("2d");
 	if (!tempCtx) {
+		appWarn("[fixedToScreen] tempCtx is undefined");
 		return;
 	}
 
@@ -151,6 +164,11 @@ const getCanvasCore = async (
 
 		tempCtx.fill();
 	}
+
+	appInfo("[fixedToScreen] tempCanvas", {
+		width: tempCanvas.width,
+		height: tempCanvas.height,
+	});
 
 	return tempCanvas;
 };
@@ -330,6 +348,11 @@ export const fixedToScreen = async (
 		appError("[fixedToScreen] canvas is undefined");
 		return;
 	}
+
+	appInfo("[fixedToScreen] canvas", {
+		width: canvas.width,
+		height: canvas.height,
+	});
 
 	await Promise.all([
 		await initPreloadPromise.then(() => {
@@ -511,8 +534,11 @@ export const handleOcrDetect = async (
 	ocrBlocksAction: OcrBlocksActionType,
 	/** 忽略如圆角、阴影等样式 */
 	ignoreStyle?: boolean,
+	/** 自定义选区参数，如果不传则使用 selectLayerAction 的选区 */
+	customSelectRectParams?: import("@/pages/draw/components/selectLayer").SelectRectParams,
 ) => {
-	const selectRectParams = selectLayerAction.getSelectRectParams();
+	const selectRectParams =
+		customSelectRectParams ?? selectLayerAction.getSelectRectParams();
 	if (!selectRectParams) {
 		return;
 	}

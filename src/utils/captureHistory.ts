@@ -304,12 +304,39 @@ export class CaptureHistory {
 					);
 				} catch (error) {
 					appWarn(
-						"[CaptureHistory] remove captureHistoryItem captureResult image failed",
+						"[CaptureHistory] remove captureHistoryItem captureResult failed",
 						error,
 					);
 				}
 			})(),
 		]);
+	}
+
+	async move(
+		id: string,
+		direction: "up" | "down",
+		appSettings: AppSettingsData,
+	) {
+		const now = Date.now();
+		const validTime =
+			appSettings[AppSettingsGroup.SystemScreenshot].historyValidDuration ===
+			HistoryValidDuration.Forever
+				? 0
+				: now -
+					appSettings[AppSettingsGroup.SystemScreenshot].historyValidDuration;
+
+		const entries = await this.store.entries();
+		const valid = entries
+			.filter(([, item]) => item.create_ts > validTime)
+			.sort((a, b) => a[1].create_ts - b[1].create_ts);
+		const idx = valid.findIndex(([itemId]) => itemId === id);
+		if (idx < 0) return;
+		const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+		if (swapIdx < 0 || swapIdx >= valid.length) return;
+		const [idA, itemA] = valid[idx];
+		const [idB, itemB] = valid[swapIdx];
+		await this.store.set(idA, { ...itemA, create_ts: itemB.create_ts });
+		await this.store.set(idB, { ...itemB, create_ts: itemA.create_ts });
 	}
 
 	async clearAll() {

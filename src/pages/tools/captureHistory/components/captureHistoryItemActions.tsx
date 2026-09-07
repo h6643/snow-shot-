@@ -1,8 +1,15 @@
-import { CopyOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+	CopyOutlined,
+	DeleteOutlined,
+	DownOutlined,
+	EditOutlined,
+	UpOutlined,
+} from "@ant-design/icons";
 import { Button, Popconfirm, Space } from "antd";
 import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { executeScreenshot } from "@/functions/screenshot";
+import type { AppSettingsData } from "@/types/appSettings";
 import type { CaptureHistory } from "@/utils/captureHistory";
 import { writeFilePathToClipboard } from "@/utils/clipboard";
 import { ScreenshotType } from "@/utils/types";
@@ -12,10 +19,12 @@ export const CaptureHistoryItemActions: React.FC<{
 	item: CaptureHistoryRecordItem;
 	reloadList: () => Promise<void>;
 	captureHistoryRef: React.RefObject<CaptureHistory | undefined>;
-}> = ({ item, reloadList, captureHistoryRef }) => {
+	appSettings: AppSettingsData;
+}> = ({ item, reloadList, captureHistoryRef, appSettings }) => {
 	const [editLoading, setEditLoading] = useState(false);
 	const [copyLoading, setCopyLoading] = useState(false);
 	const [deleteLoading, setDeleteLoading] = useState(false);
+	const [moveLoading, setMoveLoading] = useState<"up" | "down" | null>(null);
 	const deleteAction = useCallback(async () => {
 		if (!(await captureHistoryRef.current?.inited())) {
 			return;
@@ -24,8 +33,41 @@ export const CaptureHistoryItemActions: React.FC<{
 		await reloadList();
 	}, [captureHistoryRef, item.id, reloadList]);
 
+	const moveAction = useCallback(
+		async (direction: "up" | "down") => {
+			if (!(await captureHistoryRef.current?.inited())) {
+				return;
+			}
+			setMoveLoading(direction);
+			await captureHistoryRef.current?.move(item.id, direction, appSettings);
+			await reloadList();
+			setMoveLoading(null);
+		},
+		[captureHistoryRef, item.id, appSettings, reloadList],
+	);
+
 	return (
-		<Space wrap style={{ width: "100%" }}>
+		<Space wrap style={{ width: "100%", justifyContent: "flex-end" }}>
+			<Button
+				key="moveUp"
+				onClick={() => moveAction("up")}
+				size="small"
+				variant="link"
+				icon={<UpOutlined />}
+				loading={moveLoading === "up"}
+			>
+				<FormattedMessage id="tools.captureHistory.moveUp" />
+			</Button>
+			<Button
+				key="moveDown"
+				onClick={() => moveAction("down")}
+				size="small"
+				variant="link"
+				icon={<DownOutlined />}
+				loading={moveLoading === "down"}
+			>
+				<FormattedMessage id="tools.captureHistory.moveDown" />
+			</Button>
 			<Button
 				key="view"
 				onClick={async () => {

@@ -168,6 +168,14 @@ const CaptureHistoryControllerCore: React.FC<{
 				return;
 			}
 
+			// 切换截图历史时，重新加载列表确保数据最新
+			if (
+				screenshotType === ScreenshotType.SwitchCaptureHistory &&
+				typeof delta === "string"
+			) {
+				await reloadCaptureHistoryList();
+			}
+
 			if (captureHistoryListRef.current.length === 0) {
 				return;
 			}
@@ -282,6 +290,7 @@ const CaptureHistoryControllerCore: React.FC<{
 			imageLayerActionRef,
 			getScreenshotType,
 			message,
+			reloadCaptureHistoryList,
 			selectLayerActionRef,
 			setDrawEvent,
 		],

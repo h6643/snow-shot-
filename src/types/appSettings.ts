@@ -44,8 +44,6 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-
-
 export enum AppSettingsGroup {
 	Common = "common",
 	CommonTrayIcon = "commonTrayIcon",
@@ -273,8 +271,6 @@ export type AppSettingsData = {
 		saveFileFormat: ImageFormat;
 		/** OCR 后自动执行 */
 		ocrAfterAction: OcrDetectAfterAction;
-		/** OCR 复制时复制文本 */
-		ocrCopyText: boolean;
 		/** 选区预设 */
 		selectRectPresetList: SelectRectPreset[];
 	};

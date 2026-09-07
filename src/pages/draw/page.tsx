@@ -54,9 +54,9 @@ import {
 	releaseDrawPage,
 } from "@/functions/screenshot";
 import { sendErrorMessage } from "@/functions/sendMessage";
+import { useHotkeysApp } from "@/hooks/useHotkeysApp";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
-import { useHotkeysApp } from "@/hooks/useHotkeysApp";
 import { AppSettingsGroup, DoubleClickAction } from "@/types/appSettings";
 import {
 	type ElementRect,
@@ -1014,14 +1014,40 @@ const DrawPageCore: React.FC<{
 			return;
 		}
 
-		handleOcrDetect(
-			captureBoundingBoxInfoRef.current,
-			selectLayerActionRef.current,
-			imageLayerActionRef.current,
-			drawLayerActionRef.current,
-			ocrBlocksActionRef.current,
-			true,
-		);
+		// 如果没有选区，使用整个截图区域
+		const selectRectParams = selectLayerActionRef.current.getSelectRectParams();
+		if (!selectRectParams) {
+			// 没有选区，使用整个截图区域
+			const rect = captureBoundingBoxInfoRef.current.rect;
+			await handleOcrDetect(
+				captureBoundingBoxInfoRef.current,
+				selectLayerActionRef.current,
+				imageLayerActionRef.current,
+				drawLayerActionRef.current,
+				ocrBlocksActionRef.current,
+				true,
+				{
+					rect: {
+						min_x: rect.min_x,
+						min_y: rect.min_y,
+						max_x: rect.max_x,
+						max_y: rect.max_y,
+					},
+					radius: 0,
+					shadowWidth: 0,
+					shadowColor: "#000000",
+				},
+			);
+		} else {
+			handleOcrDetect(
+				captureBoundingBoxInfoRef.current,
+				selectLayerActionRef.current,
+				imageLayerActionRef.current,
+				drawLayerActionRef.current,
+				ocrBlocksActionRef.current,
+				true,
+			);
+		}
 	}, []);
 
 	const onCopyToClipboard = useCallback(async () => {
@@ -1074,25 +1100,12 @@ const DrawPageCore: React.FC<{
 			selectedText = ocrBlocksActionRef.current?.getSelectedText();
 		}
 
-		const ocrResult = ocrBlocksActionRef.current
-			?.getOcrResultAction()
-			?.getOcrResult();
 		if (
 			selectedText &&
 			selectedText.text.trim() !== "" &&
 			isOcrTool(getDrawState())
 		) {
 			writeTextToClipboard(selectedText.text);
-			finishCapture();
-			return;
-		} else if (
-			isOcrTool(getDrawState()) &&
-			getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText
-		) {
-			if (ocrResult) {
-				writeTextToClipboard(covertOcrResultToText(ocrResult.result));
-			}
-
 			finishCapture();
 			return;
 		} else {
@@ -1209,6 +1222,16 @@ const DrawPageCore: React.FC<{
 			}
 
 			if (drawPageStateRef.current === DrawPageState.Init) {
+				// 等待 canvas 初始化完成后重试
+				if (releaseExecuteScreenshotTimerRef.current?.timer) {
+					clearInterval(releaseExecuteScreenshotTimerRef.current.timer);
+				}
+				releaseExecuteScreenshotTimerRef.current = {
+					timer: setInterval(() => {
+						executeScreenshotFunc(payload.type, appWindowRef.current?.label);
+					}, 128),
+					type: payload.type,
+				};
 				return;
 			} else if (drawPageStateRef.current === DrawPageState.Release) {
 				// 这时候可能窗口还在加载中，每隔一段时间触发下截图
@@ -1252,12 +1275,27 @@ const DrawPageCore: React.FC<{
 			getCurrentWindow().close();
 		});
 
+		// 监听直接触发 OCR 的事件（用于 draw 窗口已打开时快速识别）
+		const ocrDetectListenerId = addListener("draw-window-ocr-detect", () => {
+			// F3 按下立即触发 OCR，不管当前处于哪个阶段
+			drawToolbarActionRef.current?.onToolClick(DrawState.OcrDetect);
+		});
+
 		return () => {
 			removeListener(listenerId);
 			removeListener(finishListenerId);
 			removeListener(releaseListenerId);
+			removeListener(ocrDetectListenerId);
 		};
-	}, [addListener, excuteScreenshot, removeListener, finishCapture]);
+	}, [
+		addListener,
+		excuteScreenshot,
+		removeListener,
+		finishCapture,
+		onOcrDetect,
+		getCaptureStep,
+		getDrawState,
+	]);
 
 	// 默认隐藏
 	useEffect(() => {
@@ -1322,14 +1360,17 @@ const DrawPageCore: React.FC<{
 	useEffect(() => {
 		// Ctrl+C 快捷键直接复制到剪贴板
 		const handleCopy = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.key === 'c') {
+			if (e.ctrlKey && e.key === "c") {
 				e.preventDefault();
-				// 如果在 OCR 模式，复制 OCR 结果
+				// 如果在 OCR 模式，复制 OCR 结果并关闭窗口
 				if (isOcrTool(getDrawState())) {
-					const ocrResult = ocrBlocksActionRef.current?.getOcrResultAction()?.getOcrResult();
+					const ocrResult = ocrBlocksActionRef.current
+						?.getOcrResultAction()
+						?.getOcrResult();
 					if (ocrResult) {
 						writeTextToClipboard(covertOcrResultToText(ocrResult.result));
 					}
+					finishCapture();
 					return;
 				}
 				// 否则复制图像到剪贴板
@@ -1337,9 +1378,9 @@ const DrawPageCore: React.FC<{
 			}
 		};
 
-		document.addEventListener('keydown', handleCopy);
+		document.addEventListener("keydown", handleCopy);
 		return () => {
-			document.removeEventListener('keydown', handleCopy);
+			document.removeEventListener("keydown", handleCopy);
 		};
 	}, [getDrawState, onCopyToClipboard]);
 

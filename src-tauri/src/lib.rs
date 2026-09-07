@@ -98,15 +98,6 @@ pub fn run() {
 
     #[allow(unused_mut)]
     let mut app_builder = tauri::Builder::default()
-        .plugin(
-            tauri_plugin_window_state::Builder::new()
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::SIZE
-                        | tauri_plugin_window_state::StateFlags::POSITION,
-                )
-                .with_filter(|label| label == "main")
-                .build(),
-        )
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_single_instance::init(|app, _, _| {
             let app_window = app.get_webview_window("main").expect("no main window");

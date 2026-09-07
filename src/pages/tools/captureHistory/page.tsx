@@ -3,7 +3,7 @@
 import { DeleteOutlined, ReloadOutlined } from "@ant-design/icons";
 import { type ActionType, ProList } from "@ant-design/pro-components";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Button, Popconfirm, Space, Tag, theme } from "antd";
+import { Button, Popconfirm, Space, theme } from "antd";
 import dayjs from "dayjs";
 import type { Key } from "react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -77,38 +77,6 @@ export const CaptureHistoryPage = () => {
 			removeListener(listenerId);
 		};
 	}, [addListener, reloadList, removeListener]);
-
-	const getSourceDesc = useCallback(
-		(source: CaptureHistorySource | undefined) => {
-			switch (source) {
-				case CaptureHistorySource.ScrollScreenshotCopy:
-					return (
-						<FormattedMessage id="tools.captureHistory.source.scrollScreenshotCopy" />
-					);
-				case CaptureHistorySource.ScrollScreenshotSave:
-					return (
-						<FormattedMessage id="tools.captureHistory.source.scrollScreenshotSave" />
-					);
-				case CaptureHistorySource.ScrollScreenshotFixed:
-					return (
-						<FormattedMessage id="tools.captureHistory.source.scrollScreenshotFixed" />
-					);
-				case CaptureHistorySource.Copy:
-					return <FormattedMessage id="tools.captureHistory.source.copy" />;
-				case CaptureHistorySource.Save:
-					return <FormattedMessage id="tools.captureHistory.source.save" />;
-				case CaptureHistorySource.Fixed:
-					return <FormattedMessage id="tools.captureHistory.source.fixed" />;
-				case CaptureHistorySource.FullScreen:
-					return (
-						<FormattedMessage id="tools.captureHistory.source.fullScreen" />
-					);
-			}
-
-			return <FormattedMessage id="tools.captureHistory.source.unknown" />;
-		},
-		[],
-	);
 
 	const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
 
@@ -332,54 +300,14 @@ export const CaptureHistoryPage = () => {
 					},
 					title: {
 						title: <FormattedMessage id="tools.captureHistory.date" />,
-						render: (_, item) => {
-							return (
-								<div
-									onClick={() => {
-										executeScreenshot(
-											ScreenshotType.SwitchCaptureHistory,
-											undefined,
-											item.id,
-										);
-									}}
-								>
-									{`${item.serial_number}. `}
-									<FormattedMessage id="tools.captureHistory.date" />
-									{`: ${dayjs(item.create_ts).format("YYYY-MM-DD HH:mm:ss")}`}
-								</div>
-							);
-						},
+						render: () => null,
 						search: true,
 						dataIndex: "create_ts",
 						valueType: "dateTimeRange",
 					},
 					description: {
 						search: false,
-						render: (_, item) => {
-							const { selected_rect } = item;
-
-							return (
-								<>
-									<Tag>
-										<FormattedMessage id="tools.captureHistory.position" />
-										{`: ${selected_rect.min_x} , ${selected_rect.min_y}`}
-									</Tag>
-									<Tag>
-										<FormattedMessage id="tools.captureHistory.size" />
-										{`: ${selected_rect.max_x - selected_rect.min_x} x ${selected_rect.max_y - selected_rect.min_y}`}
-									</Tag>
-									<Tag>
-										<FormattedMessage id="tools.captureHistory.drawElements" />
-										{`: ${item.excalidraw_elements?.length ?? 0}`}
-									</Tag>
-									<Tag>
-										<FormattedMessage id="tools.captureHistory.source" />
-										{`: `}
-										{getSourceDesc(item.source)}
-									</Tag>
-								</>
-							);
-						},
+						render: () => null,
 					},
 					actions: {
 						search: false,
@@ -390,6 +318,7 @@ export const CaptureHistoryPage = () => {
 									item={item}
 									reloadList={reloadList}
 									captureHistoryRef={captureHistoryRef}
+									appSettings={getAppSettings()}
 								/>
 							);
 						},
@@ -397,7 +326,23 @@ export const CaptureHistoryPage = () => {
 					extra: {
 						search: false,
 						render: (_: unknown, item: CaptureHistoryRecordItem) => {
-							return <CaptureHistoryItemPreview item={item} />;
+							return (
+								<div>
+									<div
+										style={{ marginBottom: 8, cursor: "pointer" }}
+										onClick={() => {
+											executeScreenshot(
+												ScreenshotType.SwitchCaptureHistory,
+												undefined,
+												item.id,
+											);
+										}}
+									>
+										{`${item.serial_number}. ${dayjs(item.create_ts).format("YYYY-MM-DD HH:mm:ss")}`}
+									</div>
+									<CaptureHistoryItemPreview item={item} />
+								</div>
+							);
 						},
 					},
 				}}

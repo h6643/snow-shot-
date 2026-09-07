@@ -4,7 +4,7 @@ use snow_shot_tauri_commands_core::{
     FullScreenDrawWindowLabels, MonitorsBoundingBox, VideoRecordWindowLabels,
 };
 use std::{path::PathBuf, sync::Arc};
-use tauri::{Manager, PhysicalPosition, PhysicalSize, command, ipc::Response};
+use tauri::{Manager, LogicalPosition, LogicalSize, command, ipc::Response};
 use tauri_plugin_autostart::ManagerExt;
 use tokio::sync::Mutex;
 
@@ -67,11 +67,13 @@ pub async fn create_fixed_content_window(
         Arc<snow_shot_app_services::hot_load_page_service::HotLoadPageService>,
     >,
     scroll_screenshot: bool,
+    image_path: Option<String>,
 ) -> Result<(), String> {
     snow_shot_tauri_commands_core::create_fixed_content_window(
         app,
         hot_load_page_service,
         scroll_screenshot,
+        image_path,
     )
     .await
 }
@@ -472,7 +474,7 @@ pub async fn set_window_rect(
     max_x: i32,
     max_y: i32,
 ) -> Result<(), String> {
-    match window.set_size(PhysicalSize::new(max_x - min_x, max_y - min_y)) {
+    match window.set_size(LogicalSize::new((max_x - min_x) as u32, (max_y - min_y) as u32)) {
         Ok(_) => (),
         Err(e) => {
             return Err(format!(
@@ -481,7 +483,7 @@ pub async fn set_window_rect(
             ));
         }
     }
-    match window.set_position(PhysicalPosition::new(min_x, min_y)) {
+    match window.set_position(LogicalPosition::new(min_x, min_y)) {
         Ok(_) => (),
         Err(e) => {
             return Err(format!(

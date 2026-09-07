@@ -83,7 +83,6 @@ export const HotKeySettingsPage = () => {
 					}
 				}
 
-
 				return true;
 			})
 			.map((key) => {

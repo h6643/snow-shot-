@@ -31,9 +31,13 @@ export const autoScrollThrough = async (
 	return result;
 };
 
-export const createFixedContentWindow = async (scrollScreenshot?: boolean) => {
+export const createFixedContentWindow = async (
+	scrollScreenshot?: boolean,
+	imagePath?: string,
+) => {
 	const result = await invoke<void>("create_fixed_content_window", {
 		scrollScreenshot: scrollScreenshot ?? false,
+		imagePath,
 	});
 	return result;
 };

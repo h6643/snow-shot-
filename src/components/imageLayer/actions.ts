@@ -73,16 +73,40 @@ export const initCanvasAction = async (
 	appOptions: Partial<ApplicationOptions>,
 	transfer: Transferable[] | undefined,
 ): Promise<OffscreenCanvas | HTMLCanvasElement | undefined> => {
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		if (renderWorker) {
 			const handleMessage = (event: MessageEvent<RenderResult>) => {
 				const { type, payload } = event.data;
 				if (type === BaseLayerRenderMessageType.Init) {
+					cleanup();
 					resolve(payload);
-					renderWorker.removeEventListener("message", handleMessage);
 				}
 			};
 			renderWorker.addEventListener("message", handleMessage);
+
+			const handleError = (event: ErrorEvent) => {
+				cleanup();
+				reject(
+					event.error ??
+						new Error(`Image render worker error: ${event.message}`),
+				);
+			};
+
+			const handleMessageError = () => {
+				cleanup();
+				reject(
+					new Error("Image render worker failed to deserialize a message"),
+				);
+			};
+
+			const cleanup = () => {
+				renderWorker.removeEventListener("message", handleMessage);
+				renderWorker.removeEventListener("error", handleError);
+				renderWorker.removeEventListener("messageerror", handleMessageError);
+			};
+
+			renderWorker.addEventListener("error", handleError);
+			renderWorker.addEventListener("messageerror", handleMessageError);
 
 			const InitData: BaseLayerRenderInitData = {
 				type: BaseLayerRenderMessageType.Init,
@@ -97,9 +121,7 @@ export const initCanvasAction = async (
 				renderWorker.postMessage(InitData);
 			}
 		} else {
-			renderInitCanvasAction(canvasAppRef, appOptions).then((canvas) => {
-				resolve(canvas);
-			});
+			renderInitCanvasAction(canvasAppRef, appOptions).then(resolve, reject);
 		}
 	});
 };

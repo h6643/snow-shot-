@@ -1,17 +1,7 @@
 "use client";
 
-import ProForm, {
-	ProFormSelect,
-	ProFormSwitch,
-} from "@ant-design/pro-form";
-import {
-	Col,
-	Divider,
-	Form,
-	Row,
-	Spin,
-	theme,
-} from "antd";
+import ProForm, { ProFormSelect, ProFormSwitch } from "@ant-design/pro-form";
+import { Col, Divider, Form, Row, Spin, theme } from "antd";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContentWrap } from "@/components/contentWrap";
@@ -45,8 +35,6 @@ export const FunctionSettingsPage = () => {
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionScreenshot]>();
 	const [outputForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionOutput]>();
-	const [fixedContentForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionFixedContent]>();
 	const [functionOcrForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionOcr]>();
 
@@ -57,7 +45,7 @@ export const FunctionSettingsPage = () => {
 			(settings: AppSettingsData, preSettings?: AppSettingsData) => {
 				setAppSettingsLoading(false);
 
-			if (
+				if (
 					preSettings === undefined ||
 					preSettings[AppSettingsGroup.FunctionDraw] !==
 						settings[AppSettingsGroup.FunctionDraw]
@@ -96,16 +84,6 @@ export const FunctionSettingsPage = () => {
 
 				if (
 					preSettings === undefined ||
-					preSettings[AppSettingsGroup.FunctionFixedContent] !==
-						settings[AppSettingsGroup.FunctionFixedContent]
-				) {
-					fixedContentForm.setFieldsValue(
-						settings[AppSettingsGroup.FunctionFixedContent],
-					);
-				}
-
-				if (
-					preSettings === undefined ||
 					preSettings[AppSettingsGroup.FunctionOcr] !==
 						settings[AppSettingsGroup.FunctionOcr]
 				) {
@@ -114,13 +92,7 @@ export const FunctionSettingsPage = () => {
 					);
 				}
 			},
-			[
-				functionDrawForm,
-				screenshotForm,
-				outputForm,
-				fixedContentForm,
-				functionOcrForm,
-			],
+			[functionDrawForm, screenshotForm, outputForm, functionOcrForm],
 		),
 		true,
 	);
@@ -306,19 +278,8 @@ export const FunctionSettingsPage = () => {
 									options={ocrAfterActionOptions}
 								/>
 							</Col>
-
-							<Col span={12}>
-								<ProFormSwitch
-									name="ocrCopyText"
-									layout="horizontal"
-									label={
-										<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrCopyText" />
-									}
-								/>
-							</Col>
 						</Row>
 					}
-
 				</ProForm>
 			</Spin>
 
@@ -422,44 +383,6 @@ export const FunctionSettingsPage = () => {
 					</Row>
 				</Spin>
 			</ProForm>
-
-			<Divider />
-
-			<GroupTitle
-				id="fixedContentSettings"
-				extra={
-					<ResetSettingsButton
-						title={
-							<FormattedMessage id="settings.functionSettings.fixedContentSettings" />
-						}
-						appSettingsGroup={AppSettingsGroup.FunctionFixedContent}
-					/>
-				}
-			>
-				<FormattedMessage id="settings.functionSettings.fixedContentSettings" />
-			</GroupTitle>
-
-			<Spin spinning={appSettingsLoading}>
-				<ProForm
-					form={fixedContentForm}
-					onValuesChange={(_, values) => {
-						updateAppSettings(
-							AppSettingsGroup.FunctionFixedContent,
-							values,
-							true,
-							true,
-							true,
-							true,
-							false,
-						);
-					}}
-					submitter={false}
-					layout="horizontal"
-				>
-					<Row gutter={token.marginLG}>
-					</Row>
-				</ProForm>
-			</Spin>
 
 			{
 				<>

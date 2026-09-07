@@ -328,6 +328,10 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 					callback: async () => {},
 				});
 				defaultListener.push({
+					event: "draw-window-ocr-detect",
+					callback: async () => {},
+				});
+				defaultListener.push({
 					event: LISTEN_KEY_SERVICE_MOUSE_DOWN_EMIT_KEY,
 					callback: async () => {},
 				});

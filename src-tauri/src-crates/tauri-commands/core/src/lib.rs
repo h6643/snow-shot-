@@ -155,6 +155,7 @@ pub async fn create_fixed_content_window(
     app: tauri::AppHandle,
     hot_load_page_service: tauri::State<'_, Arc<HotLoadPageService>>,
     scroll_screenshot: bool,
+    image_path: Option<String>,
 ) -> Result<(), String> {
     let (_, _, monitor) = get_target_monitor()?;
 
@@ -175,7 +176,18 @@ pub async fn create_fixed_content_window(
         window_y = monitor_y / monitor_scale_factor;
     }
 
-    let url = format!("/fixedContent?scroll_screenshot={}", scroll_screenshot);
+    let mut url = format!("/fixedContent?scroll_screenshot={}", scroll_screenshot);
+    if let Some(image_path) = image_path {
+        let encoded_image_path: String = image_path
+            .chars()
+            .map(|char| match char {
+                'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' | '~' => char.to_string(),
+                _ => format!("%{:02X}", char as u32),
+            })
+            .collect();
+        url.push_str("&image_path=");
+        url.push_str(&encoded_image_path);
+    }
 
     if let Some(window) = hot_load_page_service.pop_page().await {
         window.set_always_on_top(true).unwrap();
@@ -247,6 +259,10 @@ pub async fn create_fixed_content_window(
 pub struct FullScreenDrawWindowLabels {
     full_screen_draw_window_label: String,
     switch_mouse_through_window_label: String,
+}
+
+pub struct DrawWindowLabel {
+    pub draw_window_label: String,
 }
 
 /// 创建全屏绘制窗口

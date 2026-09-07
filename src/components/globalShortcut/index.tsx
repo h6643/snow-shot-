@@ -4,6 +4,7 @@ import {
 	HistoryOutlined,
 } from "@ant-design/icons";
 import { useDeepCompareEffect } from "@ant-design/pro-components";
+import { getAllWindows } from "@tauri-apps/api/window";
 import {
 	isRegistered,
 	register,
@@ -61,7 +62,11 @@ import {
 	type AppFunctionConfig,
 	type AppFunctionGroup,
 } from "@/types/components/appFunction";
-import { appError } from "@/utils/log";
+import {
+	CaptureHistory,
+	getCaptureHistoryImageAbsPath,
+} from "@/utils/captureHistory";
+import { appError, appWarn } from "@/utils/log";
 import { ScreenshotType } from "@/utils/types";
 
 export type GlobalShortcutContextType = {
@@ -110,157 +115,194 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 		configs: Record<AppFunction, AppFunctionComponentConfig>;
 		groupConfigs: Record<AppFunctionGroup, AppFunctionComponentConfig[]>;
 	} = useMemo(() => {
-		const configs = Object.keys(defaultAppFunctionConfigs)
-			.filter((key) => {
-				return true;
-			})
-			.reduce(
-				(configs, key) => {
-					let buttonTitle: React.ReactNode;
-					let buttonIcon: React.ReactNode;
-					let buttonOnClick: () => void | Promise<void>;
-					switch (key) {
-						case AppFunction.ScreenshotFixed:
-							buttonTitle = <FormattedMessage id="draw.fixedTool" />;
-							buttonIcon = <FixedIcon style={{ fontSize: "1.3em" }} />;
-							buttonOnClick = () => executeScreenshot(ScreenshotType.Fixed);
-							break;
-						case AppFunction.ScreenshotOcr:
-							buttonTitle = <FormattedMessage id="draw.ocrDetectTool" />;
-							buttonIcon = <OcrDetectIcon />;
-							buttonOnClick = () => executeScreenshot(ScreenshotType.OcrDetect);
-							break;
-						case AppFunction.ScreenshotFullScreen:
-							buttonTitle = (
-								<FormattedMessage id="home.screenshotFunction.screenshotFullScreen" />
+		const configs = Object.keys(defaultAppFunctionConfigs).reduce(
+			(configs, key) => {
+				let buttonTitle: React.ReactNode;
+				let buttonIcon: React.ReactNode;
+				let buttonOnClick: () => void | Promise<void>;
+				switch (key) {
+					case AppFunction.ScreenshotFixed:
+						buttonTitle = <FormattedMessage id="draw.fixedTool" />;
+						buttonIcon = <FixedIcon style={{ fontSize: "1.3em" }} />;
+						buttonOnClick = async () => {
+							const captureHistory = new CaptureHistory();
+							await captureHistory.init();
+							const captureHistoryList = await captureHistory.getList(
+								getAppSettings(),
 							);
-							buttonIcon = <FullScreenIcon />;
-							buttonOnClick = () =>
-								executeScreenshot(ScreenshotType.CaptureFullScreen);
-							break;
-						case AppFunction.ScreenshotFocusedWindow:
-							buttonTitle = (
-								<IconLabel
-									label={
-										<FormattedMessage id="home.screenshotFunction.screenshotFocusedWindow" />
-									}
-								/>
-							);
-							buttonIcon = <FocusedWindowIcon />;
-							buttonOnClick = async () => {
-								executeScreenshotFocusedWindow(getAppSettings());
-							};
-							break;
-						case AppFunction.TopWindow:
-							buttonTitle = <FormattedMessage id="home.topWindow" />;
-							buttonIcon = <TopWindowIcon />;
-							buttonOnClick = () => executeScreenshot(ScreenshotType.TopWindow);
-							break;
-						case AppFunction.FixedContent:
-							buttonTitle = <FormattedMessage id="home.fixedContent" />;
-							buttonIcon = <ClipboardIcon style={{ fontSize: "1.1em" }} />;
-							buttonOnClick = async () => {
-								if ((await getCaptureState()).capturing) {
-									return;
-								}
+							const latestCaptureHistoryItem =
+								captureHistoryList[captureHistoryList.length - 1];
+							if (!latestCaptureHistoryItem) {
+								appWarn(
+									"[GlobalShortcut] ScreenshotFixed failed, no capture history",
+								);
+								return;
+							}
 
-								createFixedContentWindow();
-							};
-							break;
-						case AppFunction.FullScreenDraw:
-							buttonTitle = <FormattedMessage id="home.fullScreenDraw" />;
-							buttonIcon = <FullScreenDrawIcon style={{ fontSize: "1.2em" }} />;
-							buttonOnClick = () => createFullScreenDrawWindow();
-							break;
-						case AppFunction.ShowOrHideMainWindow:
-							buttonTitle = <FormattedMessage id="home.showOrHideMainWindow" />;
-							buttonIcon = <AppstoreOutlined />;
-							buttonOnClick = () => showOrHideMainWindow();
-							break;
-						case AppFunction.OpenImageSaveFolder:
-							buttonTitle = <FormattedMessage id="home.openImageSaveFolder" />;
-							buttonIcon = <FolderOutlined />;
-							buttonOnClick = () => openImageSaveFolder();
-							break;
-						case AppFunction.OpenCaptureHistory:
-							buttonTitle = <FormattedMessage id="home.openCaptureHistory" />;
-							buttonIcon = <HistoryOutlined />;
-							buttonOnClick = () => openCaptureHistory();
-							break;
-						case AppFunction.Screenshot:
-							buttonTitle = <FormattedMessage id="home.screenshot" />;
-							buttonIcon = <ScreenshotIcon />;
-							buttonOnClick = () => executeScreenshot();
-							break;
+							await createFixedContentWindow(
+								false,
+								await getCaptureHistoryImageAbsPath(
+									latestCaptureHistoryItem.capture_result_file_name ??
+										latestCaptureHistoryItem.file_name,
+								),
+							);
+						};
+						break;
+					case AppFunction.ScreenshotOcr:
+						buttonTitle = <FormattedMessage id="draw.ocrDetectTool" />;
+						buttonIcon = <OcrDetectIcon />;
+						buttonOnClick = async () => {
+							// 检查 draw 窗口是否已打开且有截图
+							const windows = await getAllWindows();
+							appWarn(
+								`[globalShortcut] getAllWindows count=${windows.length}, labels: ${windows.map((w) => w.label).join(", ")}`,
+							);
+							const drawWindow = windows.find((w) =>
+								w.label.startsWith("draw-"),
+							);
+							if (drawWindow) {
+								// 直接向 draw 窗口发送 OCR 事件，不重新截图
+								appWarn(
+									`[globalShortcut] found draw window "${drawWindow.label}", emitting ocr-detect`,
+								);
+								await drawWindow.emit("draw-window-ocr-detect", {});
+							} else {
+								// draw 窗口未打开，执行正常截图流程
+								appWarn(
+									"[globalShortcut] no draw window found, running full screenshot flow",
+								);
+								executeScreenshot(ScreenshotType.OcrDetect);
+							}
+						};
+						break;
+					case AppFunction.ScreenshotFullScreen:
+						buttonTitle = (
+							<FormattedMessage id="home.screenshotFunction.screenshotFullScreen" />
+						);
+						buttonIcon = <FullScreenIcon />;
+						buttonOnClick = () =>
+							executeScreenshot(ScreenshotType.CaptureFullScreen);
+						break;
+					case AppFunction.ScreenshotFocusedWindow:
+						buttonTitle = (
+							<IconLabel
+								label={
+									<FormattedMessage id="home.screenshotFunction.screenshotFocusedWindow" />
+								}
+							/>
+						);
+						buttonIcon = <FocusedWindowIcon />;
+						buttonOnClick = async () => {
+							executeScreenshotFocusedWindow(getAppSettings());
+						};
+						break;
+					case AppFunction.TopWindow:
+						buttonTitle = <FormattedMessage id="home.topWindow" />;
+						buttonIcon = <TopWindowIcon />;
+						buttonOnClick = () => executeScreenshot(ScreenshotType.TopWindow);
+						break;
+					case AppFunction.FixedContent:
+						buttonTitle = <FormattedMessage id="home.fixedContent" />;
+						buttonIcon = <ClipboardIcon style={{ fontSize: "1.1em" }} />;
+						buttonOnClick = async () => {
+							if ((await getCaptureState()).capturing) {
+								return;
+							}
+
+							createFixedContentWindow();
+						};
+						break;
+					case AppFunction.FullScreenDraw:
+						buttonTitle = <FormattedMessage id="home.fullScreenDraw" />;
+						buttonIcon = <FullScreenDrawIcon style={{ fontSize: "1.2em" }} />;
+						buttonOnClick = () => createFullScreenDrawWindow();
+						break;
+					case AppFunction.ShowOrHideMainWindow:
+						buttonTitle = <FormattedMessage id="home.showOrHideMainWindow" />;
+						buttonIcon = <AppstoreOutlined />;
+						buttonOnClick = () => showOrHideMainWindow();
+						break;
+					case AppFunction.OpenImageSaveFolder:
+						buttonTitle = <FormattedMessage id="home.openImageSaveFolder" />;
+						buttonIcon = <FolderOutlined />;
+						buttonOnClick = () => openImageSaveFolder();
+						break;
+					case AppFunction.OpenCaptureHistory:
+						buttonTitle = <FormattedMessage id="home.openCaptureHistory" />;
+						buttonIcon = <HistoryOutlined />;
+						buttonOnClick = () => openCaptureHistory();
+						break;
+					case AppFunction.Screenshot:
+						buttonTitle = <FormattedMessage id="home.screenshot" />;
+						buttonIcon = <ScreenshotIcon />;
+						buttonOnClick = () => executeScreenshot();
+						break;
+				}
+
+				const onClick = async () => {
+					if (disableShortcutKeyRef.current) {
+						return;
 					}
 
-					const onClick = async () => {
-						if (disableShortcutKeyRef.current) {
-							return;
-						}
-
-						await buttonOnClick();
-					};
-					configs[key as AppFunction] = {
-						...defaultAppFunctionConfigs[key as AppFunction],
-						configKey: key as AppFunction,
-						title: buttonTitle,
-						icon: buttonIcon,
-						onClick,
-						onKeyChange: async (value: string, prevValue: string) => {
-							if (prevValue) {
-								try {
-									if (await isRegistered(prevValue)) {
-										await unregister(prevValue);
-									}
-								} catch (error) {
-									appError(
-										"[GlobalShortcut] unregister prevValue failed",
-										error,
-									);
-								}
-							}
-
-							if (!value) {
-								return false;
-							}
-
+					await buttonOnClick();
+				};
+				configs[key as AppFunction] = {
+					...defaultAppFunctionConfigs[key as AppFunction],
+					configKey: key as AppFunction,
+					title: buttonTitle,
+					icon: buttonIcon,
+					onClick,
+					onKeyChange: async (value: string, prevValue: string) => {
+						if (prevValue) {
 							try {
-								if (await isRegistered(value)) {
-									await unregister(value);
+								if (await isRegistered(prevValue)) {
+									await unregister(prevValue);
 								}
 							} catch (error) {
-								appError("[GlobalShortcut] unregister value failed", error);
+								appError("[GlobalShortcut] unregister prevValue failed", error);
+							}
+						}
+
+						if (!value) {
+							return false;
+						}
+
+						try {
+							if (await isRegistered(value)) {
+								await unregister(value);
+							}
+						} catch (error) {
+							appError("[GlobalShortcut] unregister value failed", error);
+						}
+
+						await register(value, async (event) => {
+							if (event.state !== "Released") {
+								return;
 							}
 
-							await register(value, async (event) => {
-								if (event.state !== "Released") {
-									return;
-								}
+							if (
+								getAppSettings()[AppSettingsGroup.FunctionGlobalShortcut]
+									.disableOnFocusedFullScreenWindow &&
+								(await hasFocusedFullScreenWindow())
+							) {
+								return;
+							}
 
-								if (
-									getAppSettings()[AppSettingsGroup.FunctionGlobalShortcut]
-										.disableOnFocusedFullScreenWindow &&
-									(await hasFocusedFullScreenWindow())
-								) {
-									return;
-								}
+							if (getTrayIconState()?.disableShortcut) {
+								return;
+							}
 
-								if (getTrayIconState()?.disableShortcut) {
-									return;
-								}
+							onClick();
+						});
 
-								onClick();
-							});
+						return true;
+					},
+				};
 
-							return true;
-						},
-					};
-
-					return configs;
-				},
-				{} as Record<AppFunction, AppFunctionComponentConfig>,
-			);
+				return configs;
+			},
+			{} as Record<AppFunction, AppFunctionComponentConfig>,
+		);
 
 		const groupConfigs = Object.values(configs).reduce(
 			(groupConfigs, config) => {

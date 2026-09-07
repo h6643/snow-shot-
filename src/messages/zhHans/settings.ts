@@ -28,7 +28,6 @@ export const settings = {
 	"settings.fullScreenAuxiliaryLineColor": "全屏辅助线颜色",
 	"settings.monitorCenterAuxiliaryLineColor": "显示器中心辅助线颜色",
 	"settings.colorPickerCenterAuxiliaryLineColor": "颜色拾取器中心辅助线颜色",
-	"settings.showOcrTranslate": "启用文本识别翻译工具",
 	"settings.customToolbarToolList": "隐藏工具栏工具",
 	"settings.customToolbarToolList.tip": "工具栏隐藏后，仍可通过热键使用",
 	"settings.enableQrcodeScan": "启用二维码识别",
@@ -74,7 +73,6 @@ export const settings = {
 	"settings.systemSettings.commonSettings.runLog": "运行日志",
 	"settings.systemSettings.commonSettings.runLog.tip":
 		"将日志输出到日志文件中，用于问题反馈",
-	"settings.hotKeySettings.translation": "翻译",
 	"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
 	"settings.systemSettings.networkSettings": "网络",
 	"settings.functionSettings.drawSettings": "绘制",
@@ -82,20 +80,6 @@ export const settings = {
 		"禁用选择相同类型的元素",
 	"settings.functionSettings.drawSettings.disableQuickSelectElementToolList.tip":
 		"在绘制时激活了当前设置中选定的工具时，将不可以通过鼠标左键选择相同类型的元素",
-	"settings.functionSettings.translationSettings": "翻译",
-	"settings.functionSettings.translationSettings.chatPrompt": "翻译提示词",
-	"settings.functionSettings.translationSettings.chatPrompt.tip":
-		"目前仅对自定义 API 的模型生效",
-	"settings.functionSettings.translationSettings.chatPrompt.required":
-		"请输入翻译提示词",
-	"settings.functionSettings.translationSettings.chatPrompt.variables":
-		"支持的变量",
-	"settings.functionSettings.translationSettings.chatPrompt.sourceLanguage":
-		"源语言",
-	"settings.functionSettings.translationSettings.chatPrompt.targetLanguage":
-		"目标语言",
-	"settings.functionSettings.translationSettings.chatPrompt.translationDomain":
-		"翻译领域",
 	"settings.functionSettings.screenshotSettings": "截图",
 	"settings.functionSettings.screenshotSettings.findChildrenElements":
 		"查找窗口子元素",
@@ -131,8 +115,6 @@ export const settings = {
 		"文本识别-复制文本",
 	"settings.functionSettings.screenshotSettings.ocrAfterAction.ocrDetectCopyTextAndCloseWindow":
 		"文本识别-复制文本并关闭窗口",
-	"settings.functionSettings.screenshotSettings.ocrCopyText":
-		"文本识别复制时复制文本",
 	"settings.functionSettings.screenshotSettings.focusedWindowCopyToClipboard":
 		"截取当前具有焦点的窗口时复制到剪贴板",
 	"settings.functionSettings.screenshotSettings.fullScreenCopyToClipboard":
@@ -256,30 +238,6 @@ export const settings = {
 		"鼠标位置",
 	"settings.printScreen.tip":
 		"Windows 下如无法唤起截图，请禁用系统的截图工具后再次尝试，如无响应可尝试重启",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
-		"优化 AI 翻译的排版",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
-		"文本识别翻译依赖翻译原文和翻译结果具有相同的排版关系，而 AI 的输出可能存在排版错误。开启后将尝试优化排版，但显示出的内容顺序可能与原文不一致",
-	"settings.functionSettings.translationSettings.apiConfig": "API 配置",
-	"settings.functionSettings.translationSettings.apiConfig.apiType": "翻译服务",
-	"settings.functionSettings.translationSettings.apiConfig.apiType.deepL":
-		"DeepL",
-	"settings.functionSettings.translationSettings.apiConfig.apiUri": "API 地址",
-	"settings.functionSettings.translationSettings.apiConfig.apiUri.tip":
-		"请直接指向翻译接口，如：https://api-free.deepl.com/v2/translate",
-	"settings.functionSettings.translationSettings.apiConfig.apiKey": "API Key",
-	"settings.functionSettings.translationSettings.apiConfig.apiKey.tip":
-		"注意该配置在本地明文保存（也不会上传到云端）",
-	"settings.functionSettings.translationSettings.apiConfig.apiUri.required":
-		"请输入 API 地址",
-	"settings.functionSettings.translationSettings.apiConfig.add":
-		"添加 API 配置",
-	"settings.functionSettings.translationSettings.apiConfig.apiKey.required":
-		"请输入 API Key",
-	"settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized":
-		"高质量模型",
-	"settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized.tip":
-		"如果开启，DeepL 会优先使用延迟更高、质量更高的翻译模型",
 	"settings.functionSettings.trayIconSettings": "托盘",
 	"settings.functionSettings.trayIconSettings.iconClickAction": "左键点击后",
 	"settings.functionSettings.trayIconSettings.iconClickAction.screenshot":

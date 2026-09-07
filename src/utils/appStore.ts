@@ -166,3 +166,9 @@ export const clearAllAppStore = async () => {
 		chatWorkflowConfigStore.clear(),
 	]);
 };
+
+export class LastScreenshotStore extends BaseStore<string> {
+	constructor() {
+		super("last-screenshot", 0);
+	}
+}

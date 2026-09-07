@@ -122,7 +122,6 @@ export const OcrBlocks: React.FC<{
 		[finishCapture, getAppSettings, getDrawState, getScreenshotType],
 	);
 
-
 	return (
 		<OcrResult
 			zIndex={zIndexs.Draw_OcrResult}

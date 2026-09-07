@@ -23,10 +23,7 @@ import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { zhHans } from "@/messages/zhHans";
-import {
-	AppSettingsGroup,
-	AppSettingsTheme,
-} from "@/types/appSettings";
+import { AppSettingsGroup, AppSettingsTheme } from "@/types/appSettings";
 import type { RouteItem, RouteMapItem } from "@/types/components/menuLayout";
 import { getPlatformValue } from "@/utils/platform";
 import { MenuContent } from "./components/menuContent";
@@ -53,12 +50,9 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 	const routerLocation = useLocation();
 	const pathname = routerLocation.pathname || "/";
 	useAppSettingsLoad(
-		useCallback(
-			(settings) => {
-				// ...
-			},
-			[],
-		),
+		useCallback((settings) => {
+			// ...
+		}, []),
 	);
 
 	const { token } = theme.useToken();
@@ -159,56 +153,8 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 						key: "/settings/functionSettings",
 						path: "/settings/functionSettings",
 						label: intl.formatMessage({ id: "menu.settings.functionSettings" }),
-						tabs: [
-							{
-								key: "screenshotSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.screenshotSettings",
-								}),
-							},
-							{
-								key: "functionDrawSettings",
-								label: intl.formatMessage({
-									id: "settings.commonSettings.draw",
-								}),
-							},
-							{
-								key: "fixedContentSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.fixedContentSettings",
-								}),
-							},
-							{
-								key: "ocrSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.ocrSettings",
-								}),
-							},
-							{
-								key: "fullScreenDrawSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.fullScreenDrawSettings",
-								}),
-							},
-							{
-								key: "trayIconSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.trayIconSettings",
-								}),
-							},
-							{
-								key: "globalShortcutSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.globalShortcutSettings",
-								}),
-							},
-							{
-								key: "outputSettings",
-								label: intl.formatMessage({
-									id: "settings.functionSettings.outputSettings",
-								}),
-							},
-						],
+						hideTabs: true,
+						tabs: [],
 					},
 					{
 						key: "/settings/systemSettings",

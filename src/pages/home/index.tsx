@@ -41,14 +41,9 @@ export const HomePage = () => {
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
 
-	const resetAllFilter = useCallback(
-		(settings: Record<string, unknown>) => {
-			return settings as Partial<
-				AppSettingsData[AppSettingsGroup.AppFunction]
-			>;
-		},
-		[],
-	);
+	const resetAllFilter = useCallback((settings: Record<string, unknown>) => {
+		return settings as Partial<AppSettingsData[AppSettingsGroup.AppFunction]>;
+	}, []);
 
 	const [currentPlatform] = usePlatform();
 
@@ -113,7 +108,6 @@ export const HomePage = () => {
 							return true;
 					}
 				}
-
 
 				return true;
 			})
@@ -233,11 +227,7 @@ export const HomePage = () => {
 					<FormattedMessage id="home.commonFunction" />
 				</GroupTitle>
 				<Spin spinning={updateShortcutKeyStatusLoading || appSettingsLoading}>
-					<Space
-						direction="vertical"
-						size="middle"
-						style={{ display: "flex" }}
-					>
+					<Space direction="vertical" size="middle" style={{ display: "flex" }}>
 						{Object.values(defaultAppFunctionComponentGroupConfigs)
 							.flat()
 							.filter((config) => {
@@ -388,11 +378,16 @@ export const HomePage = () => {
 									id={`settings.hotKeySettings.${configGroup}`}
 								/>
 							</GroupTitle>
-							<Spin spinning={hotKeySettingsLoading}>
-								<Row gutter={token.marginLG}>
-									{keyEventFormItemList[configGroup as CommonKeyEventGroup]}
-								</Row>
-							</Spin>
+							<Form
+								className="settings-form common-settings-form"
+								form={_commonKeyEventForm}
+							>
+								<Spin spinning={hotKeySettingsLoading}>
+									<Row gutter={token.marginLG}>
+										{keyEventFormItemList[configGroup as CommonKeyEventGroup]}
+									</Row>
+								</Spin>
+							</Form>
 
 							{index !== keyEventFormItemListKeys.length - 1 && <Divider />}
 						</div>

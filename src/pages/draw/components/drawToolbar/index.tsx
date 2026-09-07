@@ -244,7 +244,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 		[onDraggingChange],
 	);
 
-
 	const onToolClick = useCallback(
 		(drawState: DrawState) => {
 			const prev = getDrawState();
@@ -603,9 +602,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 						// Fixed类型不再自动贴图，保持图像在画布中
 						// 用户需要手动按快捷键或点击"固定到屏幕"按钮
 						break;
-					case ScreenshotType.OcrDetect:
-						onToolClick(DrawState.OcrDetect);
-						break;
 					case ScreenshotType.Copy:
 						onCopyToClipboard();
 						break;
@@ -904,7 +900,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 									onToolClick(DrawState.OcrDetect);
 								}}
 							/>
-
 
 							{/* 滚动截图 */}
 							<ToolButton

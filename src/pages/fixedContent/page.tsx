@@ -91,6 +91,16 @@ export const FixedContentPage: React.FC = () => {
 			}
 
 			fixedContentActionRef.current?.init({ imageContent: imageData });
+		} else if (urlParams.get("image_path") !== null) {
+			const imagePath = urlParams.get("image_path");
+			if (!imagePath) {
+				getCurrentWindow().close();
+				return;
+			}
+
+			fixedContentActionRef.current?.init({
+				imageContent: convertFileSrc(imagePath),
+			});
 		} else {
 			let hasInit = false;
 

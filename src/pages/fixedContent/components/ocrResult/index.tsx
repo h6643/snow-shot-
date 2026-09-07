@@ -45,7 +45,6 @@ export type AppOcrResult = {
 
 export type AllOcrResult = {
 	ocrResult: AppOcrResult | undefined;
-	translatedResult: undefined;
 };
 
 export type OcrResultInitDrawCanvasParams = {
@@ -845,7 +844,6 @@ export const OcrResult: React.FC<{
 			getAllOcrResult: () => {
 				return {
 					ocrResult: ocrResultRef.current,
-					translatedResult: undefined,
 				};
 			},
 		}),

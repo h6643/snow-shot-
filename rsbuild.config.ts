@@ -5,9 +5,15 @@ import { tanstackRouter } from "@tanstack/router-plugin/rspack";
 
 export default defineConfig({
 	plugins: [pluginReact(), pluginNodePolyfill()],
+	dev: {
+		// 关闭 lazy compilation，避免 pixi.js 等模块触发 lazy-compilation-proxy 模块找不到的问题
+		lazyCompilation: false,
+	},
 	resolve: {
 		alias: {
 			"@": "./src",
+			// 替换 browser-fs-access 为一个简单的 mock，避免打包问题
+			"browser-fs-access$": "@/mocks/browser-fs-access",
 		},
 	},
 	output: {
@@ -65,5 +71,9 @@ export default defineConfig({
 				},
 			},
 		},
+	},
+	// 修复模块加载问题
+	source: {
+		exclude: [/@excalidraw\/excalidraw\/dist\/dev\/chunk-TPDO5EF3\.js/],
 	},
 });

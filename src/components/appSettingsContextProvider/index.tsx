@@ -701,10 +701,6 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.ocrAfterAction === "string"
 							? (newSettings.ocrAfterAction as OcrDetectAfterAction)
 							: (prevSettings?.ocrAfterAction ?? OcrDetectAfterAction.None),
-					ocrCopyText:
-						typeof newSettings?.ocrCopyText === "boolean"
-							? newSettings.ocrCopyText
-							: (prevSettings?.ocrCopyText ?? false),
 					focusedWindowCopyToClipboard:
 						typeof newSettings?.focusedWindowCopyToClipboard === "boolean"
 							? newSettings.focusedWindowCopyToClipboard

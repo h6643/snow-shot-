@@ -1,4 +1,14 @@
-import { CloseOutlined, EditOutlined, CopyOutlined, SaveOutlined, PushpinOutlined, EyeOutlined, SlidersOutlined, FullscreenOutlined, SwitcherOutlined } from "@ant-design/icons";
+import {
+	CloseOutlined,
+	CopyOutlined,
+	EditOutlined,
+	EyeOutlined,
+	FullscreenOutlined,
+	PushpinOutlined,
+	SaveOutlined,
+	SlidersOutlined,
+	SwitcherOutlined,
+} from "@ant-design/icons";
 import type { ExcalidrawElement } from "@mg-chao/excalidraw/element/types";
 import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
 import { Menu, type MenuItemOptions, Submenu } from "@tauri-apps/api/menu";
@@ -26,6 +36,7 @@ import { isHotkeyPressed, useHotkeys } from "react-hotkeys-hook";
 import { FormattedMessage, useIntl } from "react-intl";
 import { getMousePosition, saveFile } from "@/commands";
 import {
+	createFullScreenDrawWindow,
 	getCurrentMonitorInfo,
 	type MonitorInfo,
 	setCurrentWindowAlwaysOnTop,
@@ -48,7 +59,6 @@ import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import { useTempInfo } from "@/hooks/useTempInfo";
 import { useTextScaleFactor } from "@/hooks/useTextScaleFactor";
 import { copyToClipboard as copyToClipboardDrawAction } from "@/pages/draw/actions";
-import { createFullScreenDrawWindow } from "@/commands/core";
 import type { SelectRectParams } from "@/pages/draw/components/selectLayer";
 import {
 	type CaptureBoundingBoxInfo,
@@ -76,7 +86,7 @@ import {
 	covertOcrResultToText,
 	OcrResult,
 	type OcrResultActionType,
-	OcrResultType,
+	type OcrResultType,
 } from "../ocrResult";
 import { renderToCanvasAction } from "./actions";
 import {
@@ -1077,6 +1087,8 @@ const FixedContentCoreInner: React.FC<{
 						covertOcrResultToText(currentOcrResult.result),
 					);
 				}
+				await closeWindowComplete();
+				return;
 			} else {
 				if (fixedContentTypeRef.current === FixedContentType.Html) {
 					const selectedText = htmlContentContainerRef.current?.contentWindow
@@ -2013,6 +2025,9 @@ const FixedContentCoreInner: React.FC<{
 					cancelable: true,
 				});
 				document.dispatchEvent(keyEvent);
+			} else if (type === "copyText") {
+				// iframe 内已阻止默认复制行为，直接关闭窗口
+				closeWindowComplete();
 			} else if (type === "mousedown") {
 				onScrollDown(event.data as unknown as React.MouseEvent<HTMLDivElement>);
 			}
@@ -2573,10 +2588,7 @@ const FixedContentCoreInner: React.FC<{
 						transition: `opacity ${token.motionDurationFast} ${token.motionEaseInOut}`,
 						zIndex: zIndexs.FixedToScreen_CloseButton,
 						// iframe 无法点击 close 按钮
-						display:
-							isThumbnail || enableDraw
-								? "none"
-								: undefined,
+						display: isThumbnail || enableDraw ? "none" : undefined,
 						pointerEvents: "auto",
 					}}
 				>

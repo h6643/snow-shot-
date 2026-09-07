@@ -1,7 +1,5 @@
 export const plugin = {
 	"plugin.extensionFunction": "插件功能",
-	"plugin.translate.name": "翻译",
-	"plugin.translate.description": "支持图片翻译、文本翻译等功能",
 	"plugin.status.NotInstalled": "未安装",
 	"plugin.status.Installed": "已安装",
 	"plugin.status.Downloading": "下载中",

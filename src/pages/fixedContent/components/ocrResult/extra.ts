@@ -52,6 +52,10 @@ export const getOcrResultIframeSrcDoc = (
                         <script>
                             document.oncopy = (e) => {
                                 if (${enableCopy ? "true" : "false"}) {
+                                    const selected = window.getSelection();
+                                    if (selected && selected.toString().trim()) {
+                                        window.parent.postMessage({ type: 'copyText' }, '*');
+                                    }
                                     return;
                                 }
 

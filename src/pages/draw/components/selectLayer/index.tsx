@@ -956,6 +956,11 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 				return;
 			}
 
+			// 切换截图历史时不触发自动框选
+			if (getScreenshotType()?.type === ScreenshotType.SwitchCaptureHistory) {
+				return;
+			}
+
 			// 防止自动框选阻塞手动选择
 			const currentSelectRect = await autoSelect(
 				new MousePosition(
@@ -1282,9 +1287,14 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 	>(async () => {
 		await initSelectWindowElement();
 
+		// 切换截图历史时不触发自动框选，避免与 setPrevSelectRect 竞态
+		if (getScreenshotType()?.type === ScreenshotType.SwitchCaptureHistory) {
+			return;
+		}
+
 		// 初始化可能晚于截图准备
 		refreshMouseMove(true);
-	}, [initSelectWindowElement, refreshMouseMove]);
+	}, [initSelectWindowElement, refreshMouseMove, getScreenshotType]);
 
 	useStateSubscriber(
 		DrawStatePublisher,
