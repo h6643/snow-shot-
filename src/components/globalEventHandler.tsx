@@ -1,11 +1,9 @@
 import { useRouter } from "@tanstack/react-router";
 import { openPath } from "@tauri-apps/plugin-opener";
 import React, { useContext, useEffect } from "react";
-import { getSelectedText } from "@/commands/core";
 import { EventListenerContext } from "@/components/eventListener";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
-import { encodeParamsValue } from "@/utils/base64";
 import { getImageSaveDirectory } from "@/utils/file";
 import { showWindow } from "@/utils/window";
 

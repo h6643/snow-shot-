@@ -4,7 +4,6 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import {
 	type Window as AppWindow,
 	getCurrentWindow,
-	PhysicalPosition,
 } from "@tauri-apps/api/window";
 import { theme } from "antd";
 import Color, { type ColorInstance } from "color";
@@ -58,9 +57,7 @@ import type { CaptureHistoryItem } from "@/utils/appStore";
 import { getCaptureHistoryImageAbsPath } from "@/utils/captureHistory";
 import { writeTextToClipboard } from "@/utils/clipboard";
 import { supportOffscreenCanvas } from "@/utils/environment";
-import { getExcalidrawCanvas } from "@/utils/excalidraw";
 import { MousePosition } from "@/utils/mousePosition";
-import { getPlatform } from "@/utils/platform";
 import { ScreenshotType } from "@/utils/types";
 import { zIndexs } from "@/utils/zIndex";
 import {
@@ -463,7 +460,7 @@ const ColorPickerCore: React.FC<{
 
 	const pickerPositionElementRef = useRef<HTMLDivElement>(null);
 
-	const { isDisableMouseMove, enableMouseMove, disableMouseMove } =
+	const { isDisableMouseMove, enableMouseMove } =
 		useMoveCursor();
 	const updateImageDataPutImage = useCallback(
 		async (x: number, y: number, colorX: number, colorY: number) => {

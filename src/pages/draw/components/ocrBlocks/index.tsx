@@ -44,8 +44,7 @@ export const OcrBlocks: React.FC<{
 	actionRef: React.RefObject<OcrBlocksActionType | undefined>;
 	finishCapture: () => void;
 }> = ({ actionRef, finishCapture }) => {
-	const { selectLayerActionRef, imageLayerActionRef, drawLayerActionRef } =
-		useContext(DrawContext);
+	const { drawLayerActionRef } = useContext(DrawContext);
 	const ocrResultActionRef = useRef<OcrResultActionType>(undefined);
 
 	const [getScreenshotType] = useStateSubscriber(

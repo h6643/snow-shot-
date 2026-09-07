@@ -55,7 +55,6 @@ import {
 	CaptureEventPublisher,
 	CaptureStepPublisher,
 	DrawEvent,
-	type DrawEventParams,
 	DrawEventPublisher,
 	ScreenshotTypePublisher,
 } from "../../extra";
@@ -1068,7 +1067,7 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 		[getAppSettings],
 	);
 
-	const { disableMouseMove, enableMouseMove, isDisableMouseMove } =
+	const { enableMouseMove, isDisableMouseMove } =
 		useMoveCursor();
 
 	/// 启用整体移动选区时，鼠标当时的位置

@@ -627,7 +627,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 		[
 			getScreenshotType,
 			onCopyToClipboard,
-			onFixed,
 			onToolClick,
 			onTopWindow,
 			showDrawToolbarContainerDebounce,

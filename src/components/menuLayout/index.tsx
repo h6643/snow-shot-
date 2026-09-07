@@ -22,7 +22,6 @@ import { AppContext } from "@/contexts/appContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
-import { zhHans } from "@/messages/zhHans";
 import { AppSettingsGroup, AppSettingsTheme } from "@/types/appSettings";
 import type { RouteItem, RouteMapItem } from "@/types/components/menuLayout";
 import { getPlatformValue } from "@/utils/platform";
@@ -45,12 +44,10 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 	const intl = useIntl();
 	const appSettings = useContext(AppSettingsActionContext);
 	const { currentTheme } = useContext(AppContext);
-	const { updateAppSettings } = appSettings;
-
 	const routerLocation = useLocation();
 	const pathname = routerLocation.pathname || "/";
 	useAppSettingsLoad(
-		useCallback((settings) => {
+		useCallback(() => {
 			// ...
 		}, []),
 	);
